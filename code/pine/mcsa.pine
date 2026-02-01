@@ -1,4 +1,5 @@
 //@version=6
+// For algorithm documentation, see: ../docs/minervini-chartist-scoring-algorithm-mcsa.md
 indicator("Minervini-Chartist Scoring Algorithm (MCSA)", overlay=true)
 
 // === INPUTS ===
@@ -121,13 +122,13 @@ bonus := math.min(bonus, 15)
 total_score = technical_score * 40 + fundamental_score * 35 + vcp_score * 15 + bonus
 
 // === DECISION MATRIX ===
-category = total_score >= 85 ? "Mükemmel Setup" : total_score >= 70 ? "Güçlü Setup" : total_score >= 55 ? "Orta Setup" : "Zayıf Setup"
+category = total_score >= 85 ? "Excellent Setup" : total_score >= 70 ? "Strong Setup" : total_score >= 55 ? "Average Setup" : "Weak Setup"
 
 // === PLOT ===
-plotshape(category == "Mükemmel Setup", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small, title="Mükemmel Setup")
-plotshape(category == "Güçlü Setup", style=shape.triangleup, location=location.belowbar, color=color.blue, size=size.tiny, title="Güçlü Setup")
-plotshape(category == "Orta Setup", style=shape.triangleup, location=location.belowbar, color=color.orange, size=size.tiny, title="Orta Setup")
-plotshape(category == "Zayıf Setup", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny, title="Zayıf Setup")
+plotshape(category == "Excellent Setup", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small, title="Excellent Setup")
+plotshape(category == "Strong Setup", style=shape.triangleup, location=location.belowbar, color=color.blue, size=size.tiny, title="Strong Setup")
+plotshape(category == "Average Setup", style=shape.triangleup, location=location.belowbar, color=color.orange, size=size.tiny, title="Average Setup")
+plotshape(category == "Weak Setup", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny, title="Weak Setup")
 
 // === TABLE OUTPUT ===
 if barstate.islast
