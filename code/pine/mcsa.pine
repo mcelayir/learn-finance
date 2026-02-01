@@ -1,0 +1,100 @@
+//@version=6
+indicator("Minervini-Chartist Scoring Algorithm (MCSA)", overlay=true)
+
+// === INPUTS ===
+pe_ratio = input.float(20, "P/E Ratio", minval=0)
+pb_ratio = input.float(2, "P/B Ratio", minval=0)
+debt_equity = input.float(0.5, "Debt/Equity Ratio", minval=0)
+roe = input.float(18, "ROE (%)", minval=0)
+net_margin = input.float(12, "Net Profit Margin (%)", minval=0)
+rev_growth_qoq = input.float(5, "Revenue Growth QoQ (%)", minval=-100)
+earnings_growth_qoq = input.float(7, "Earnings Growth QoQ (%)", minval=-100)
+entered_template_last_20d = input.bool(true, "Entered Template Last 20 Days")
+volume_breakout = input.bool(true, "Volume Breakout (>150% 50d avg)")
+
+// === TECHNICALS ===
+price = close
+ma_50 = ta.sma(close, 50)
+ma_150 = ta.sma(close, 150)
+ma_200 = ta.sma(close, 200)
+low_52w = ta.lowest(low, 252)
+high_52w = ta.highest(high, 252)
+
+// 200MA trending up for 1 month (20 trading days)
+ma_200_trend_up_1m = ma_200 > ta.lowest(ma_200, 20)
+
+// ATRs
+atr = ta.atr(14)
+atr_20 = ta.sma(atr, 20)
+atr_50 = ta.sma(atr, 50)
+
+// Price range contraction (VCP)
+price_range_3w = ta.highest(high, 15) - ta.lowest(low, 15)
+price_range_prev_3w = ta.highest(high[15], 15) - ta.lowest(low[15], 15)
+
+// Volume dry-up
+volume_quiet = ta.sma(volume, 3)
+volume_50d_avg = ta.sma(volume, 50)
+
+// === PHASE 1: TECHNICAL FILTER ===
+technical_checks = array.new_bool()
+array.push(technical_checks, price > ma_150)
+array.push(technical_checks, price > ma_200)
+array.push(technical_checks, ma_150 > ma_200)
+array.push(technical_checks, ma_200_trend_up_1m)
+array.push(technical_checks, ma_50 > ma_150)
+array.push(technical_checks, ma_50 > ma_200)
+array.push(technical_checks, price > ma_50)
+array.push(technical_checks, price > low_52w * 1.3 and price >= high_52w * 0.75)
+// Helper: Convert bool array to float array
+f_bool_to_float_array(arr) =>
+    float_arr = array.new_float(array.size(arr), 0.0)
+    for i = 0 to array.size(arr) - 1
+        array.set(float_arr, i, array.get(arr, i) ? 1.0 : 0.0)
+    float_arr
+
+technical_score = array.size(technical_checks) > 0 ? array.sum(f_bool_to_float_array(technical_checks)) / array.size(technical_checks) : na
+
+// === PHASE 2: FUNDAMENTAL FILTER ===
+fundamental_checks = array.new_bool()
+array.push(fundamental_checks, pe_ratio >= 5 and pe_ratio <= 50)
+array.push(fundamental_checks, pb_ratio <= 5)
+array.push(fundamental_checks, debt_equity <= 1.0)
+array.push(fundamental_checks, roe >= 15)
+array.push(fundamental_checks, net_margin >= 10)
+array.push(fundamental_checks, rev_growth_qoq > 0)
+array.push(fundamental_checks, earnings_growth_qoq > 0)
+fundamental_score = array.size(fundamental_checks) > 0 ? array.sum(f_bool_to_float_array(fundamental_checks)) / array.size(fundamental_checks) : na
+
+// === PHASE 3: VCP & TIMING ===
+vcp_checks = array.new_bool()
+array.push(vcp_checks, atr < atr_20 and atr_20 < atr_50)
+array.push(vcp_checks, price_range_3w <= price_range_prev_3w * 0.8)
+array.push(vcp_checks, volume_quiet <= volume_50d_avg * 0.8)
+array.push(vcp_checks, math.abs(price - ma_50) <= ma_50 * 0.05)
+vcp_score = array.size(vcp_checks) > 0 ? array.sum(f_bool_to_float_array(vcp_checks)) / array.size(vcp_checks) : na
+
+// === PHASE 4: BONUS ===
+bonus = 0.0
+if entered_template_last_20d
+    bonus += 10
+if volume_breakout
+    bonus += 5
+bonus := math.min(bonus, 15)
+
+// === TOTAL SCORE ===
+total_score = technical_score * 40 + fundamental_score * 35 + vcp_score * 15 + bonus
+
+// === DECISION MATRIX ===
+category = total_score >= 85 ? "Mükemmel Setup" : total_score >= 70 ? "Güçlü Setup" : total_score >= 55 ? "Orta Setup" : "Zayıf Setup"
+
+// === PLOT ===
+plotshape(category == "Mükemmel Setup", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small, title="Mükemmel Setup")
+plotshape(category == "Güçlü Setup", style=shape.triangleup, location=location.belowbar, color=color.blue, size=size.tiny, title="Güçlü Setup")
+plotshape(category == "Orta Setup", style=shape.triangleup, location=location.belowbar, color=color.orange, size=size.tiny, title="Orta Setup")
+plotshape(category == "Zayıf Setup", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.tiny, title="Zayıf Setup")
+
+// === TABLE OUTPUT ===
+if barstate.islast
+    var table t = table.new(position.top_center, 1, 1)
+    table.cell(t, 0, 0, "MCSA Score: " + str.tostring(total_score, format.mintick) + "\nCategory: " + category, bgcolor=color.new(color.black, 0), text_color=color.white)
