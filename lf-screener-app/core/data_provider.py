@@ -121,22 +121,29 @@ class DataProvider:
             try:
                 from tradingview_screener.query import Query
                 q = Query()
-                # If looking for BIST/Turkey, set markets to 'turkey'. For turkey, avoid select() as some fields may be rejected.
                 is_turkey = any(x in index for x in ("BIST", "TURKEY", "IST"))
+                is_us = any(x in index for x in ("NASDAQ", "NYSE", "AMEX", "SPX", "DOWJONES", "AMERICA", "USA"))
                 if is_turkey:
                     q = q.set_markets('turkey')
                     count, df = q.get_scanner_data()
+                    symbol_col = 'ticker'
+                elif is_us:
+                    q = q.set_markets('america')
+                    count, df = q.select('symbol', 'name', 'close').get_scanner_data()
+                    symbol_col = 'symbol'
                 else:
-                    count, df = q.select('ticker', 'name', 'close').get_scanner_data()
+                    # fallback: try global
+                    count, df = q.select('symbol', 'name', 'close').get_scanner_data()
+                    symbol_col = 'symbol'
 
-                if count and not df.empty and 'ticker' in df.columns:
+                if count and not df.empty and symbol_col in df.columns:
                     pref = f"{index}:"
-                    items = [t for t in df['ticker'].astype(str).tolist() if t.upper().startswith(pref)]
+                    items = [t for t in df[symbol_col].astype(str).tolist() if t.upper().startswith(pref)]
                     if items:
                         print(f"DataProvider: fetched {len(items)} symbols from tradingview Query API filtered by prefix={pref}")
                         return items
                     # If no strict prefix match, try contains index
-                    items = [t for t in df['ticker'].astype(str).tolist() if index in t.upper()]
+                    items = [t for t in df[symbol_col].astype(str).tolist() if index in t.upper()]
                     if items:
                         print(f"DataProvider: fetched {len(items)} symbols from tradingview Query API by contains '{index}'")
                         return items
