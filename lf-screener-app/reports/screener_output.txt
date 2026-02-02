@@ -1,8 +1,54 @@
-MCSA Screener Report - 2026-02-02T16:09:25.908235 UTC
-= DISCOVERY FAILURE =
+MCSA Screener Report - 2026-02-02T16:17:51.584104 UTC
+= Summary by group =
 
-Market: NO_SUCH_MARKET
-Message: No tickers discovered for market 'NO_SUCH_MARKET'. Aborting.
+-- Excellent Setup (0) --
 
-No tickers were discovered for the requested market.
-Please check connectivity, TradingView credentials, or enable local fallback.
+-- Strong Setup (0) --
+
+-- Average Setup (6) --
+BIST:THYAO: score=65.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 100}
+BIST:HALKB: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:KTLEV: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:KLRHO: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:PEKGY: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:TERA: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+
+-- Weak Setup (37) --
+BIST:GMSTR: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:TUPRS: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:AKBNK: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:EREGL: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:SISE: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:MGROS: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:GUBRF: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:CWENE: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:YKBNK: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:ISCTR: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:ASELS: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:GARAN: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:KCHOL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:BIMAS: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:SAHOL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:TCELL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:EKGYO: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:ASTOR: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:FROTO: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:CVKMD: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:AEFES: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:KRDMD: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:ENKAI: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:PASEU: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:VAKBN: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:PETKM: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:MEGMT: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:TAVHL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:TOASO: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:ALARK: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+BIST:PGSUS: score=25.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 100}
+BIST:SASA: score=25.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 100}
+BIST:TEHOL: score=15.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:ALTIN: score=15.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+BIST:ALVES: score=10.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:CANTE: score=10.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+BIST:TTKOM: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+

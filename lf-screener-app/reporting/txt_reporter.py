@@ -18,8 +18,11 @@ class GroupedTXTReporter(BaseReporter):
             f.write(f"MCSA Screener Report - {datetime.utcnow().isoformat()} UTC\n")
             f.write("= Summary by group =\n\n")
             for cat in ["Excellent Setup", "Strong Setup", "Average Setup", "Weak Setup"]:
-                f.write(f"-- {cat} ({len(groups.get(cat, []))}) --\n")
-                for r in groups.get(cat, []):
+                # Sort group by score descending for readability
+                grp = groups.get(cat, [])
+                grp_sorted = sorted(grp, key=lambda x: float(x.get("score", 0.0)), reverse=True)
+                f.write(f"-- {cat} ({len(grp_sorted)}) --\n")
+                for r in grp_sorted:
                     f.write(f"{r['ticker']}: score={r['score']} comps={r['components']}\n")
                 f.write("\n")
         return self.output_file
