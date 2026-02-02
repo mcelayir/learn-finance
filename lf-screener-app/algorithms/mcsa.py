@@ -43,13 +43,13 @@ class MCSAAlgorithm(BaseAlgorithm):
 
         # Determine category
         if total >= 85:
-            category = "Mükemmel Setup"
+            category = "Excellent Setup"
         elif total >= 70:
-            category = "Güçlü Setup"
+            category = "Strong Setup"
         elif total >= 55:
-            category = "Orta Setup"
+            category = "Average Setup"
         else:
-            category = "Zayıf Setup"
+            category = "Weak Setup"
 
         return {
             "ticker": ticker,
