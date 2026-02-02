@@ -1,0 +1,4 @@
+# Requirements for lf-screener-app
+tradingview-screener
+python-dotenv
+PyYAML

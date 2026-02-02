@@ -1,0 +1,3 @@
+market: "BIST"
+max_workers: 10
+output_file: "reports/screener_output.txt"
