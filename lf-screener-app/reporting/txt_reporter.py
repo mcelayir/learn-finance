@@ -23,3 +23,14 @@ class GroupedTXTReporter(BaseReporter):
                     f.write(f"{r['ticker']}: score={r['score']} comps={r['components']}\n")
                 f.write("\n")
         return self.output_file
+
+    def report_failure(self, market: str, message: str):
+        """Write a short report indicating that discovery failed for the given market."""
+        with open(self.output_file, "w") as f:
+            f.write(f"MCSA Screener Report - {datetime.utcnow().isoformat()} UTC\n")
+            f.write("= DISCOVERY FAILURE =\n\n")
+            f.write(f"Market: {market}\n")
+            f.write(f"Message: {message}\n\n")
+            f.write("No tickers were discovered for the requested market.\n")
+            f.write("Please check connectivity, TradingView credentials, or enable local fallback.\n")
+        return self.output_file

@@ -1,11 +1,8 @@
-MCSA Screener Report - 2026-02-02T15:46:58.876879 UTC
-= Summary by group =
+MCSA Screener Report - 2026-02-02T16:09:25.908235 UTC
+= DISCOVERY FAILURE =
 
--- Excellent Setup (0) --
+Market: NO_SUCH_MARKET
+Message: No tickers discovered for market 'NO_SUCH_MARKET'. Aborting.
 
--- Strong Setup (0) --
-
--- Average Setup (0) --
-
--- Weak Setup (0) --
-
+No tickers were discovered for the requested market.
+Please check connectivity, TradingView credentials, or enable local fallback.
