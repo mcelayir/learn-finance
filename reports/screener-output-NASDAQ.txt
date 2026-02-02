@@ -1,0 +1,8 @@
+MCSA Screener Report - 2026-02-02T20:29:17.375185 UTC
+= DISCOVERY FAILURE =
+
+Market: NASDAQ
+Message: No tickers discovered for market 'NASDAQ'. Aborting.
+
+No tickers were discovered for the requested market.
+Please check connectivity, TradingView credentials, or enable local fallback.

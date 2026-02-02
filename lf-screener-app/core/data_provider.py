@@ -396,37 +396,44 @@ class DataProvider:
         return None
 
     def fetch_data(self, ticker: str) -> Dict:
-        """Try live providers first (yfinance) then fall back to deterministic mock values for PoC."""
+        """
+        Try live providers in order:
+        1. yfinance (for price/volume/MA/ATR, some fundamentals)
+        2. Deterministic mock fallback for PoC
+        """
         provider = self.config.get("preferred_provider", "")
 
+        # 1. Try yfinance for price/volume/MA/ATR
+        data = None
         if provider == "tradingview_yfinance" and _HAS_YFINANCE:
             data = self._fetch_data_yfinance(ticker)
             if data:
                 print(f"DataProvider: fetched live data for {ticker} via yfinance")
-                return data
 
-        # Existing mock fallback (deterministic)
-        seed = abs(hash(ticker)) % (2**32)
-        rnd = random.Random(seed)
-        price = rnd.uniform(10, 200)
-        ma150 = price * rnd.uniform(0.85, 1.02)
-        ma200 = ma150 * rnd.uniform(0.95, 1.05)
-        atr_current = rnd.uniform(0.1, 5.0)
-        atr_20 = atr_current * rnd.uniform(0.9, 1.5)
-        volume = rnd.uniform(10000, 1_000_000)
-        vol_20 = volume * rnd.uniform(0.8, 1.2)
-        roe = rnd.uniform(-5, 30)
-        debt_equity = rnd.uniform(0.0, 2.0)
-
-        return {
-            "ticker": ticker,
-            "price": price,
-            "ma150": ma150,
-            "ma200": ma200,
-            "atr_current": atr_current,
-            "atr_20": atr_20,
-            "volume": volume,
-            "vol_20": vol_20,
-            "roe": roe,
-            "debt_equity": debt_equity,
-        }
+        # If nothing from yfinance, use deterministic mock fallback
+        merged = data.copy() if data else {"ticker": ticker}
+        if not merged or len(merged) <= 1:
+            seed = abs(hash(ticker)) % (2**32)
+            rnd = random.Random(seed)
+            price = rnd.uniform(10, 200)
+            ma150 = price * rnd.uniform(0.85, 1.02)
+            ma200 = ma150 * rnd.uniform(0.95, 1.05)
+            atr_current = rnd.uniform(0.1, 5.0)
+            atr_20 = atr_current * rnd.uniform(0.9, 1.5)
+            volume = rnd.uniform(10000, 1_000_000)
+            vol_20 = volume * rnd.uniform(0.8, 1.2)
+            roe = rnd.uniform(-5, 30)
+            debt_equity = rnd.uniform(0.0, 2.0)
+            merged = {
+                "ticker": ticker,
+                "price": price,
+                "ma150": ma150,
+                "ma200": ma200,
+                "atr_current": atr_current,
+                "atr_20": atr_20,
+                "volume": volume,
+                "vol_20": vol_20,
+                "roe": roe,
+                "debt_equity": debt_equity,
+            }
+        return merged
