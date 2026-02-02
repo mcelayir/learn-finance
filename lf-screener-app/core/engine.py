@@ -1,8 +1,8 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
-from ..algorithms.mcsa import MCSAAlgorithm
-from ..algorithms.mocks import RandomScoreAlgorithm
-from ..core.data_provider import DataProvider
+from algorithms.mcsa import MCSAAlgorithm
+from algorithms.mocks import RandomScoreAlgorithm
+from core.data_provider import DataProvider
 
 class Engine:
     def __init__(self, config: dict):
@@ -17,6 +17,11 @@ class Engine:
     def run(self, market: str = None) -> List[dict]:
         market = market or self.config.get("market", "BIST")
         tickers = self.dp.get_index_tickers(market)
+
+        # Abort early if discovery returned no tickers to avoid empty reports
+        if not tickers:
+            raise RuntimeError(f"No tickers discovered for market '{market}'. Aborting.")
+
         results = []
         with ThreadPoolExecutor(max_workers=self.max_workers) as ex:
             futures = {ex.submit(self._run_for_ticker, t): t for t in tickers}

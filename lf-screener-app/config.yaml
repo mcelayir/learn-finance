@@ -1,3 +1,20 @@
 market: "BIST"
 max_workers: 10
 output_file: "reports/screener_output.txt"
+
+# Data provider configuration
+preferred_provider: "tradingview_yfinance"  # options: tradingview_yfinance, tradingview_only, mock
+# Discovery order: attempts will run in order; available methods: tradingview, exchange, local
+discovery_order:
+  - "tradingview"
+  - "exchange"
+  - "local"
+# If false, local file fallback (data/tickers/{INDEX}.txt) will be skipped
+allow_local_ticker_fallback: false
+# Verbose discovery logging and exception traces
+discovery_verbose: true
+
+yfinance:
+  max_retries: 3
+  history_period: "1y"
+  history_interval: "1d"

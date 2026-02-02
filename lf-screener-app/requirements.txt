@@ -2,3 +2,4 @@
 tradingview-screener
 python-dotenv
 PyYAML
+yfinance

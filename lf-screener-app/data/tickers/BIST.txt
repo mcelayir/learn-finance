@@ -1,0 +1,6 @@
+BIST:AKBNK
+BIST:THYAO
+BIST:EREGL
+BIST:GARAN
+BIST:SISE
+# Add more tickers here, one per line
