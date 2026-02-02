@@ -1,8 +1,37 @@
-MCSA Screener Report - 2026-02-02T20:32:20.559066 UTC
-= DISCOVERY FAILURE =
+MCSA Screener Report - 2026-02-02T21:45:17.379991 UTC
+= Summary by group =
 
-Market: NASDAQ
-Message: No tickers discovered for market 'NASDAQ'. Aborting.
+-- Excellent Setup (0) --
 
-No tickers were discovered for the requested market.
-Please check connectivity, TradingView credentials, or enable local fallback.
+-- Strong Setup (0) --
+
+-- Average Setup (4) --
+NASDAQ:TSLA: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:AMZN: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:WDC: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:WMT: score=55.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+
+-- Weak Setup (22) --
+NASDAQ:SNDK: score=50.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+NASDAQ:AAPL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:META: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:GOOGL: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:NVDA: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:MU: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:QQQ: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:AMD: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:GOOG: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:TQQQ: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:INTC: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:LRCX: score=40.0 comps={'technical': 100, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:HOOD: score=25.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 100}
+NASDAQ:PLTR: score=15.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:AVGO: score=15.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:MSTR: score=15.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 100, 'bonus': 0}
+NASDAQ:IBIT: score=10.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 100}
+NASDAQ:MSFT: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:NFLX: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:APP: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:SQQQ: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+NASDAQ:TLT: score=0.0 comps={'technical': 0, 'fundamental': 0, 'vcp': 0, 'bonus': 0}
+

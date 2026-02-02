@@ -126,16 +126,14 @@ class DataProvider:
                 if is_turkey:
                     q = q.set_markets('turkey')
                     count, df = q.get_scanner_data()
-                    symbol_col = 'ticker'
                 elif is_us:
                     q = q.set_markets('america')
-                    count, df = q.select('symbol', 'name', 'close').get_scanner_data()
-                    symbol_col = 'symbol'
+                    count, df = q.get_scanner_data()
                 else:
                     # fallback: try global
-                    count, df = q.select('symbol', 'name', 'close').get_scanner_data()
-                    symbol_col = 'symbol'
+                    count, df = q.get_scanner_data()
 
+                symbol_col = 'ticker'
                 if count and not df.empty and symbol_col in df.columns:
                     pref = f"{index}:"
                     items = [t for t in df[symbol_col].astype(str).tolist() if t.upper().startswith(pref)]
