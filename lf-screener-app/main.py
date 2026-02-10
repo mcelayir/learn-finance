@@ -27,7 +27,6 @@ def main():
     try:
         results = engine.run(market)
     except RuntimeError as e:
-        # Instead of aborting silently, write a short failure report for visibility
         msg = str(e)
         print(msg)
         out = reporter.report_failure(market, msg)
@@ -36,6 +35,23 @@ def main():
 
     out = reporter.report(results)
     print(f"Report written to: {out}")
+
+    # Write fundamentals for each stock to stock_fundamentals_MARKET.txt
+    fundamentals_file = os.path.join(output_dir, f"stock_fundamentals_{market.upper()}.txt")
+    with open(fundamentals_file, "w") as f:
+        f.write(f"Stock Fundamentals Report - {market.upper()} - {os.path.basename(output_file)}\n")
+        f.write("Ticker | Fundamentals\n")
+        f.write("-"*80 + "\n")
+        # Sort results by ticker alphabetically
+        sorted_results = sorted(results, key=lambda x: x.get("ticker", ""))
+        for r in sorted_results:
+            ticker = r.get("ticker", "")
+            raw = r.get("raw", {})
+            # Only show fundamental fields, now including standard_pb_ratio
+            fund_keys = ["pe_ratio", "pb_ratio", "standard_pb_ratio", "debt_equity", "roe", "net_margin", "rev_growth_qoq", "earnings_growth_qoq"]
+            fundamentals = {k: raw.get(k) for k in fund_keys if k in raw}
+            f.write(f"{ticker}: {fundamentals}\n")
+    print(f"Fundamentals written to: {fundamentals_file}")
 
 if __name__ == "__main__":
     main()

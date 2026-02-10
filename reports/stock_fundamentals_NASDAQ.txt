@@ -1,0 +1,31 @@
+Stock Fundamentals Report - NASDAQ - screener-output-NASDAQ.txt
+Ticker | Fundamentals
+--------------------------------------------------------------------------------
+NASDAQ:AAPL: {'pe_ratio': 36.88636412595045, 'pb_ratio': 62.1582752408347, 'standard_pb_ratio': 62.1582752408347, 'debt_equity': 1.449970041941282, 'roe': 144.5756695708293, 'net_margin': 26.91448206261864}
+NASDAQ:AMD: {'pe_ratio': 109.375, 'pb_ratio': 24.8090692124105, 'standard_pb_ratio': 5.472972972972973, 'debt_equity': 0.03931203931203931, 'roe': 4.812770654665874, 'net_margin': 9.574324324324323}
+NASDAQ:AMZN: {'pe_ratio': 33.28699588062874, 'pb_ratio': 9.274006551002762, 'standard_pb_ratio': 8.246624211821143, 'debt_equity': 0.45774032241144175, 'roe': 24.69489806623072, 'net_margin': 10.53966927347621}
+NASDAQ:AVGO: {'pe_ratio': 77.24129596159827, 'pb_ratio': -20.57490740040663, 'standard_pb_ratio': 21.517315984054093, 'debt_equity': 0.9983747044917255, 'roe': 25.40108746727529, 'net_margin': 31.575433911882513}
+NASDAQ:COIN: {'pe_ratio': 12.94242649399358, 'pb_ratio': 4.850447424122129, 'standard_pb_ratio': 4.189275323926788, 'debt_equity': 0.48453608247422686, 'roe': 23.120080808080807, 'net_margin': 40.814693295292436}
+NASDAQ:GOOG: {'pe_ratio': 34.95042052450059, 'pb_ratio': 14.395441333106444, 'standard_pb_ratio': 12.93170009988532, 'debt_equity': 0.08569973258627277, 'roe': 32.976219346923635, 'net_margin': 31.120086160473882}
+NASDAQ:GOOGL: {'pe_ratio': 34.94198312236287, 'pb_ratio': 14.391966120915727, 'standard_pb_ratio': 12.928578250350185, 'debt_equity': 0.08569973258627277, 'roe': 32.976219346923635, 'net_margin': 31.120086160473882}
+NASDAQ:HOOD: {'pe_ratio': None, 'pb_ratio': 9.187521469192614, 'standard_pb_ratio': 8.907181008274115, 'debt_equity': 1.013869625520111, 'roe': None, 'net_margin': None}
+NASDAQ:IBIT: {'debt_equity': None, 'roe': None}
+NASDAQ:INTC: {'pe_ratio': 4824.000167846675, 'pb_ratio': 2.9465257055686447, 'standard_pb_ratio': 2.10415238508876, 'debt_equity': 0.5037775763070415, 'roe': 0.1807539217981733, 'net_margin': 0.36115269461077754}
+NASDAQ:LITE: {'pe_ratio': 1528.5454952355583, 'pb_ratio': -46.85119166537476, 'standard_pb_ratio': 38.64085893687399, 'debt_equity': 2.9244335305279607, 'roe': 3.0894018011570346, 'net_margin': 1.574468085106383}
+NASDAQ:META: {'pe_ratio': 28.900820266177504, 'pb_ratio': 10.527294689208546, 'standard_pb_ratio': 9.284008736261608, 'debt_equity': 0.26861585632939117, 'roe': 29.273782134640392, 'net_margin': 30.894695170229614}
+NASDAQ:MSFT: {'pe_ratio': 27.919859108349954, 'pb_ratio': 18.52330445169709, 'standard_pb_ratio': 9.676252601349049, 'debt_equity': 0.2055568403316925, 'roe': 30.252173536917688, 'net_margin': 35.706749259725676}
+NASDAQ:MSTR: {'pe_ratio': 7.137424807456274, 'pb_ratio': -7.0391081711409935, 'standard_pb_ratio': 5.750783333452058, 'debt_equity': 1.1326259946949602, 'roe': 15.475908870576829, 'net_margin': 1035.8445266368178}
+NASDAQ:MU: {'pe_ratio': 50.050982306985304, 'pb_ratio': 9.396593328758913, 'standard_pb_ratio': 9.081365732046274, 'debt_equity': 0.30705128205128207, 'roe': 16.17271091752675, 'net_margin': 22.85255552582285}
+NASDAQ:NFLX: {'pe_ratio': 33.00816438636001, 'pb_ratio': -44.892816051280306, 'standard_pb_ratio': 13.990445099247015, 'debt_equity': 0.629749393694422, 'roe': 40.654205607476634, 'net_margin': 24.066390041493776}
+NASDAQ:NVDA: {'pe_ratio': 48.55367369570975, 'pb_ratio': 69.817350342687, 'standard_pb_ratio': 63.92684248372888, 'debt_equity': 0.1550834597875569, 'roe': 93.71212121212122, 'net_margin': 52.41208159312391}
+NASDAQ:PLTR: {'pe_ratio': 500.0384404109074, 'pb_ratio': 65.58281945122613, 'standard_pb_ratio': 65.58281945122613, 'debt_equity': 0.056646666666666665, 'roe': 13.765554553651938, 'net_margin': 22.20896738339783}
+NASDAQ:QCOM: {'pe_ratio': 13.018147378391385, 'pb_ratio': None, 'standard_pb_ratio': None, 'debt_equity': None, 'roe': None, 'net_margin': 26.768377253814148}
+NASDAQ:QQQ: {'debt_equity': None, 'roe': None}
+NASDAQ:SMH: {'debt_equity': None, 'roe': None}
+NASDAQ:SNDK: {'pe_ratio': None, 'pb_ratio': 16.0179153972611, 'standard_pb_ratio': 6.914400146484375, 'debt_equity': 0.061, 'roe': -15.64160288158487, 'net_margin': -22.297817715019256}
+NASDAQ:SOXX: {'debt_equity': None, 'roe': None}
+NASDAQ:SQQQ: {'debt_equity': None, 'roe': None}
+NASDAQ:TLT: {'debt_equity': None, 'roe': None}
+NASDAQ:TQQQ: {'debt_equity': None, 'roe': None}
+NASDAQ:TSLA: {'pe_ratio': 242.20121430187692, 'pb_ratio': None, 'standard_pb_ratio': None, 'debt_equity': None, 'roe': None, 'net_margin': 5.498745294855708}
+NASDAQ:WMT: {'pe_ratio': 47.721805429100094, 'pb_ratio': 16.94080471338694, 'standard_pb_ratio': 11.568814205022042, 'debt_equity': 0.7008285098172738, 'roe': 23.181324647122693, 'net_margin': 3.0801413835389164}

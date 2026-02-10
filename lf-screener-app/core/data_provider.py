@@ -403,20 +403,36 @@ class DataProvider:
     def fetch_data(self, ticker: str) -> Dict:
         """
         Try live providers in order:
-        1. yfinance (for price/volume/MA/ATR, some fundamentals)
-        2. Deterministic mock fallback for PoC
+        1. stockdex for NASDAQ (fundamentals)
+        2. yfinance (for price/volume/MA/ATR, some fundamentals)
+        3. Deterministic mock fallback for PoC
         """
         provider = self.config.get("preferred_provider", "")
 
-        # 1. Try yfinance for price/volume/MA/ATR
+        # Use stockdex for NASDAQ tickers
+        if ticker.upper().startswith("NASDAQ:"):
+            try:
+                from core.stockdex_fundamentals import fetch_stockdex_fundamentals
+                symbol = ticker.split(":", 1)[1]
+                fundamentals = fetch_stockdex_fundamentals(symbol)
+            except Exception as e:
+                print(f"stockdex fetch failed for {ticker}: {e}")
+                fundamentals = {}
+        else:
+            fundamentals = {}
+
+        # 2. Try yfinance for price/volume/MA/ATR
         data = None
         if provider == "tradingview_yfinance" and _HAS_YFINANCE:
             data = self._fetch_data_yfinance(ticker)
             if data:
                 print(f"DataProvider: fetched live data for {ticker} via yfinance")
 
-        # If nothing from yfinance, use deterministic mock fallback
+        # Merge stockdex fundamentals if available
         merged = data.copy() if data else {"ticker": ticker}
+        merged.update(fundamentals)
+
+        # If nothing from yfinance, use deterministic mock fallback
         if not merged or len(merged) <= 1:
             seed = abs(hash(ticker)) % (2**32)
             rnd = random.Random(seed)

@@ -1,3 +1,11 @@
+# MCSA fundamental thresholds
+mcsa_thresholds:
+  pe_ratio_min: 5
+  pe_ratio_max: 50
+  pb_ratio_max: 5
+  roe_min: 15
+  net_margin_min: 10
+  debt_equity_max: 1.0
 market: "BIST"
 max_workers: 10
 output_file: "reports/screener_output.txt"
