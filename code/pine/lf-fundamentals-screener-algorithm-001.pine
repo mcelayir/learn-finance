@@ -1,0 +1,182 @@
+//@version=6
+indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Screener", overlay=false)
+
+// This screener implements the 15 criteria defined in
+// docs/finance/lf-fundementals-screener-algorithm-001-en.md.
+//
+// Usage:
+// - For quick testing, fill the inputs below manually.
+// - To integrate with TradingView fundamentals (when available), replace
+//   the input values with calls to the platform's financial/fundamental
+//   request functions and set the inputs to `na`.
+
+// --- Inputs (quarterly / annual metrics) ---
+string market_segment = input.string("YILDIZ", "Market Segment (e.g. YILDIZ)")
+
+// Quarterly series (most recent quarter and previous quarter)
+float roe_q           = input.float(0.0, "ROE (most recent quarter)")
+float roe_q_prev      = input.float(0.0, "ROE (previous quarter)")
+
+float netprofit_q     = input.float(0.0, "Net Profit (most recent quarter)")
+float netprofit_q_prev= input.float(0.0, "Net Profit (previous quarter)")
+
+float revenue_q       = input.float(0.0, "Revenue (most recent quarter)")
+float revenue_q_prev  = input.float(0.0, "Revenue (previous quarter)")
+
+float ebitda_q        = input.float(0.0, "EBITDA (most recent quarter)")
+float ebitda_q_prev   = input.float(0.0, "EBITDA (previous quarter)")
+
+float operprofit_q    = input.float(0.0, "Operating Profit (most recent quarter)")
+float operprofit_q_prev = input.float(0.0, "Operating Profit (previous quarter)")
+
+float eps_q           = input.float(0.0, "EPS (most recent quarter)")
+float eps_q_prev      = input.float(0.0, "EPS (previous quarter)")
+
+// Other fields
+float free_float      = input.float(0.0, "Free Float Rate (0-1)")
+float peg_ratio       = input.float(0.0, "PEG Ratio")
+float earnings_growth = input.float(0.0, "Annual Earnings Growth Rate (%)")
+
+float current_assets  = input.float(0.0, "Current Assets")
+float current_liab    = input.float(0.0, "Current Liabilities")
+float total_debt      = input.float(0.0, "Total Debt")
+float cash_equiv      = input.float(0.0, "Cash & Cash Equivalents")
+float inventory       = input.float(0.0, "Inventory")
+
+// Operating cash flow (annual)
+float opcf_current_y  = input.float(0.0, "Operating Cash Flow (current year)")
+float opcf_prev_y     = input.float(0.0, "Operating Cash Flow (previous year)")
+
+// --- Helper guards ---
+is_non_na(x) => not na(x)
+
+// Criterion checks (booleans). Any `na` inputs cause the specific check
+// to evaluate to `false` (conservative default). Users can replace inputs
+// with platform-fetched fields when available.
+
+// 1 — Star Market Listing
+c1 = str.upper(market_segment) == "YILDIZ" or str.upper(market_segment) == "YLDIZ"
+
+// 2 — Quarterly Increasing ROE
+c2 = is_non_na(roe_q) and is_non_na(roe_q_prev) and (roe_q > roe_q_prev)
+
+// 3 — Quarterly Increasing Net Profit
+c3 = is_non_na(netprofit_q) and is_non_na(netprofit_q_prev) and (netprofit_q > netprofit_q_prev)
+
+// 4 — Quarterly Increasing Revenue
+c4 = is_non_na(revenue_q) and is_non_na(revenue_q_prev) and (revenue_q > revenue_q_prev)
+
+// 5 — Quarterly Increasing EBITDA
+c5 = is_non_na(ebitda_q) and is_non_na(ebitda_q_prev) and (ebitda_q > ebitda_q_prev)
+
+// 6 — Quarterly Increasing EBITDA Margins
+ebitda_margin_q      = is_non_na(ebitda_q) and is_non_na(revenue_q) and (revenue_q != 0) ? ebitda_q / revenue_q : na
+ebitda_margin_q_prev = is_non_na(ebitda_q_prev) and is_non_na(revenue_q_prev) and (revenue_q_prev != 0) ? ebitda_q_prev / revenue_q_prev : na
+c6 = is_non_na(ebitda_margin_q) and is_non_na(ebitda_margin_q_prev) and (ebitda_margin_q > ebitda_margin_q_prev)
+
+// 7 — Quarterly Increasing Operating Profit
+c7 = is_non_na(operprofit_q) and is_non_na(operprofit_q_prev) and (operprofit_q > operprofit_q_prev)
+
+// 8 — Quarterly Increasing EPS
+c8 = is_non_na(eps_q) and is_non_na(eps_q_prev) and (eps_q > eps_q_prev)
+
+// 9 — Free Float Rate Below 70%
+c9 = is_non_na(free_float) and (free_float < 0.70)
+
+// 10 — PEG Ratio Below 1 (only when earnings growth > 0)
+c10 = is_non_na(peg_ratio) and is_non_na(earnings_growth) and (earnings_growth > 0) and (peg_ratio < 1.0)
+
+// 11 — Current Ratio Between 1 and 3
+curr_ratio = is_non_na(current_assets) and is_non_na(current_liab) and (current_liab != 0) ? current_assets / current_liab : na
+c11 = is_non_na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
+
+// 12 — Net Debt / EBITDA Below 3
+net_debt = is_non_na(total_debt) and is_non_na(cash_equiv) ? (total_debt - cash_equiv) : na
+// Annualize EBITDA if quarterly input is provided
+ebitda_annual = is_non_na(ebitda_q) ? ebitda_q * 4.0 : na
+c12 = false
+if is_non_na(net_debt)
+    if is_non_na(ebitda_annual) and (ebitda_annual > 0)
+        c12 := (net_debt / ebitda_annual) < 3.0
+    else
+        // Negative net debt (more cash than debt) passes automatically
+        c12 := net_debt < 0
+
+// 13 — Cash Ratio Above 0.2
+cash_ratio = is_non_na(cash_equiv) and is_non_na(current_liab) and (current_liab != 0) ? cash_equiv / current_liab : na
+c13 = is_non_na(cash_ratio) and (cash_ratio > 0.20)
+
+// 14 — Quick Ratio Between 0.5 and 2
+quick_ratio = is_non_na(current_assets) and is_non_na(inventory) and is_non_na(current_liab) and (current_liab != 0) ? (current_assets - inventory) / current_liab : na
+c14 = is_non_na(quick_ratio) and (quick_ratio >= 0.5) and (quick_ratio <= 2.0)
+
+// 15 — Positive Year-over-Year Operating Cash Flow Growth
+c15 = is_non_na(opcf_current_y) and is_non_na(opcf_prev_y) and (opcf_current_y > opcf_prev_y)
+
+// Overall result: require all criteria to be true
+all_pass = c1 and c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9 and c10 and c11 and c12 and c13 and c14 and c15
+
+// --- Visualization ---
+// One-line status on the chart: PASS/FAIL
+var label statusLbl = na
+if barstate.islast
+    statusText = all_pass ? "PASS: All 15 criteria" : "FAIL"
+    labelColor = all_pass ? color.new(color.green, 0) : color.new(color.red, 0)
+    if not na(statusLbl)
+        label.delete(statusLbl)
+    statusLbl := label.new(bar_index, high, statusText, color=labelColor, textcolor=color.white, style=label.style_label_down)
+
+// Table showing each criterion and its boolean result (only on final bar)
+var table t = table.new(position.top_right, 2, 16, border_width=1)
+if barstate.islast
+    // Header
+    table.cell(t, 0, 0, "Criterion", text_color=color.white, bgcolor=color.new(color.blue, 10))
+    table.cell(t, 1, 0, "Pass", text_color=color.white, bgcolor=color.new(color.blue, 10))
+
+    // Rows (1..15)
+    table.cell(t, 0, 1, "1 — Star Market")
+    table.cell(t, 1, 1, c1 ? "✔" : "✖", text_color = c1 ? color.green : color.red)
+
+    table.cell(t, 0, 2, "2 — ROE ↑ q/q")
+    table.cell(t, 1, 2, c2 ? "✔" : "✖", text_color = c2 ? color.green : color.red)
+
+    table.cell(t, 0, 3, "3 — Net Profit ↑ q/q")
+    table.cell(t, 1, 3, c3 ? "✔" : "✖", text_color = c3 ? color.green : color.red)
+
+    table.cell(t, 0, 4, "4 — Revenue ↑ q/q")
+    table.cell(t, 1, 4, c4 ? "✔" : "✖", text_color = c4 ? color.green : color.red)
+
+    table.cell(t, 0, 5, "5 — EBITDA ↑ q/q")
+    table.cell(t, 1, 5, c5 ? "✔" : "✖", text_color = c5 ? color.green : color.red)
+
+    table.cell(t, 0, 6, "6 — EBITDA Margin ↑ q/q")
+    table.cell(t, 1, 6, c6 ? "✔" : "✖", text_color = c6 ? color.green : color.red)
+
+    table.cell(t, 0, 7, "7 — Operating Profit ↑ q/q")
+    table.cell(t, 1, 7, c7 ? "✔" : "✖", text_color = c7 ? color.green : color.red)
+
+    table.cell(t, 0, 8, "8 — EPS ↑ q/q")
+    table.cell(t, 1, 8, c8 ? "✔" : "✖", text_color = c8 ? color.green : color.red)
+
+    table.cell(t, 0, 9, "9 — Free Float < 70%")
+    table.cell(t, 1, 9, c9 ? "✔" : "✖", text_color = c9 ? color.green : color.red)
+
+    table.cell(t, 0, 10, "10 — PEG < 1 (growth>0)")
+    table.cell(t, 1, 10, c10 ? "✔" : "✖", text_color = c10 ? color.green : color.red)
+
+    table.cell(t, 0, 11, "11 — Current Ratio 1..3")
+    table.cell(t, 1, 11, c11 ? "✔" : "✖", text_color = c11 ? color.green : color.red)
+
+    table.cell(t, 0, 12, "12 — Net Debt / EBITDA < 3")
+    table.cell(t, 1, 12, c12 ? "✔" : "✖", text_color = c12 ? color.green : color.red)
+
+    table.cell(t, 0, 13, "13 — Cash Ratio > 0.2")
+    table.cell(t, 1, 13, c13 ? "✔" : "✖", text_color = c13 ? color.green : color.red)
+
+    table.cell(t, 0, 14, "14 — Quick Ratio 0.5..2")
+    table.cell(t, 1, 14, c14 ? "✔" : "✖", text_color = c14 ? color.green : color.red)
+
+    table.cell(t, 0, 15, "15 — OCF YoY > 0")
+    table.cell(t, 1, 15, c15 ? "✔" : "✖", text_color = c15 ? color.green : color.red)
+
+// End of screener
