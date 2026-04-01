@@ -193,6 +193,14 @@ c15 = not na(opcf_current_y_val) and not na(opcf_prev_y_val) and (opcf_current_y
 // Overall result: require all criteria to be true
 all_pass = c1 and c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9 and c10 and c11 and c12 and c13 and c14 and c15
 
+// Helper functions for the results table.
+// cellText: "✔" pass | "✖" fail | "—" data missing
+// cellColor: green   | red       | gray
+cellText(bool pass, bool dataOk) =>
+    dataOk ? (pass ? "✔" : "✖") : "—"
+cellColor(bool pass, bool dataOk) =>
+    dataOk ? (pass ? color.green : color.red) : color.gray
+
 // --- Visualization ---
 // One-line status on the chart: PASS/FAIL
 var label statusLbl = na
@@ -206,13 +214,6 @@ if barstate.islast
 // Table showing each criterion and its boolean result (only on final bar)
 var table t = table.new(position.top_right, 2, 16, border_width=1)
 if barstate.islast
-    // Helper: returns "✔" / "✖" / "—" and the matching colour.
-    // dataOk = false means required inputs are na → show "—" in grey.
-    cellText(bool pass, bool dataOk) =>
-        dataOk ? (pass ? "✔" : "✖") : "—"
-    cellColor(bool pass, bool dataOk) =>
-        dataOk ? (pass ? color.green : color.red) : color.gray
-
     // Header
     table.cell(t, 0, 0, "Criterion", text_color=color.white, bgcolor=color.new(color.blue, 10))
     table.cell(t, 1, 0, "Pass", text_color=color.white, bgcolor=color.new(color.blue, 10))
