@@ -82,7 +82,7 @@ float ebitda_q_prev_val     = not na(ebitda_q_prev_fetched) ? ebitda_q_prev_fetc
 // Annual EBITDA fetched separately for use in Net Debt/EBITDA (c12)
 float f_ebitda_fy           = auto_fetch ? request.financial(syminfo.tickerid, "ebitda", "FY") : na
 
-float f_operprofit_q            = auto_fetch ? request.financial(syminfo.tickerid, "operating_income", "FQ") : na
+float f_operprofit_q            = auto_fetch ? request.financial(syminfo.tickerid, "OPER_INCOME", "FQ") : na
 float operprofit_q_prev_fetched = ta.valuewhen(not na(f_operprofit_q) and not na(f_operprofit_q[1]) and f_operprofit_q != f_operprofit_q[1], f_operprofit_q[1], 0)
 float operprofit_q_val          = not na(f_operprofit_q) ? f_operprofit_q : (auto_fetch ? na : operprofit_q)
 float operprofit_q_prev_val     = not na(operprofit_q_prev_fetched) ? operprofit_q_prev_fetched : (auto_fetch ? na : operprofit_q_prev)
@@ -93,8 +93,11 @@ float eps_q_val          = not na(f_eps_q) ? f_eps_q : (auto_fetch ? na : eps_q)
 float eps_q_prev_val     = not na(eps_q_prev_fetched) ? eps_q_prev_fetched : (auto_fetch ? na : eps_q_prev)
 
 // Other fields (try annual/TTM where appropriate)
-float f_free_float       = auto_fetch ? request.financial(syminfo.tickerid, "float_shares_percent", "FY") : na
-float free_float_val     = not na(f_free_float) ? f_free_float : (auto_fetch ? na : free_float)
+// Free float ratio = float shares / total shares (no direct percentage field in TV)
+float f_float_shares  = auto_fetch ? request.financial(syminfo.tickerid, "FLOAT_SHARES_OUTSTANDING", "FY") : na
+float f_total_shares  = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_SHARES_OUTSTANDING", "FY") : na
+float f_free_float    = not na(f_float_shares) and not na(f_total_shares) and f_total_shares != 0 ? f_float_shares / f_total_shares : na
+float free_float_val  = not na(f_free_float) ? f_free_float : (auto_fetch ? na : free_float)
 
 float f_peg              = auto_fetch ? request.financial(syminfo.tickerid, "price_earnings_to_growth_ttm", "TTM") : na
 float peg_ratio_val      = not na(f_peg) ? f_peg : (auto_fetch ? na : peg_ratio)
