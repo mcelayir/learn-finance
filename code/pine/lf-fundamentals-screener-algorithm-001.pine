@@ -14,38 +14,38 @@ indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Scre
 string market_segment = input.string("YILDIZ", "Market Segment (e.g. YILDIZ)")
 
 // Quarterly series (most recent quarter and previous quarter)
-float roe_q           = input.float(0.0, "ROE (most recent quarter)")
-float roe_q_prev      = input.float(0.0, "ROE (previous quarter)")
+float roe_q           = input.float(na, "ROE (most recent quarter)")
+float roe_q_prev      = input.float(na, "ROE (previous quarter)")
 
-float netprofit_q     = input.float(0.0, "Net Profit (most recent quarter)")
-float netprofit_q_prev= input.float(0.0, "Net Profit (previous quarter)")
+float netprofit_q     = input.float(na, "Net Profit (most recent quarter)")
+float netprofit_q_prev= input.float(na, "Net Profit (previous quarter)")
 
-float revenue_q       = input.float(0.0, "Revenue (most recent quarter)")
-float revenue_q_prev  = input.float(0.0, "Revenue (previous quarter)")
+float revenue_q       = input.float(na, "Revenue (most recent quarter)")
+float revenue_q_prev  = input.float(na, "Revenue (previous quarter)")
 
-float ebitda_q        = input.float(0.0, "EBITDA (most recent quarter)")
-float ebitda_q_prev   = input.float(0.0, "EBITDA (previous quarter)")
+float ebitda_q        = input.float(na, "EBITDA (most recent quarter)")
+float ebitda_q_prev   = input.float(na, "EBITDA (previous quarter)")
 
-float operprofit_q    = input.float(0.0, "Operating Profit (most recent quarter)")
-float operprofit_q_prev = input.float(0.0, "Operating Profit (previous quarter)")
+float operprofit_q    = input.float(na, "Operating Profit (most recent quarter)")
+float operprofit_q_prev = input.float(na, "Operating Profit (previous quarter)")
 
-float eps_q           = input.float(0.0, "EPS (most recent quarter)")
-float eps_q_prev      = input.float(0.0, "EPS (previous quarter)")
+float eps_q           = input.float(na, "EPS (most recent quarter)")
+float eps_q_prev      = input.float(na, "EPS (previous quarter)")
 
 // Other fields
-float free_float      = input.float(0.0, "Free Float Rate (0-1)")
-float peg_ratio       = input.float(0.0, "PEG Ratio")
-float earnings_growth = input.float(0.0, "Annual Earnings Growth Rate (%)")
+float free_float      = input.float(na, "Free Float Rate (0-1)")
+float peg_ratio       = input.float(na, "PEG Ratio")
+float earnings_growth = input.float(na, "Annual Earnings Growth Rate (%)")
 
-float current_assets  = input.float(0.0, "Current Assets")
-float current_liab    = input.float(0.0, "Current Liabilities")
-float total_debt      = input.float(0.0, "Total Debt")
-float cash_equiv      = input.float(0.0, "Cash & Cash Equivalents")
-float inventory       = input.float(0.0, "Inventory")
+float current_assets  = input.float(na, "Current Assets")
+float current_liab    = input.float(na, "Current Liabilities")
+float total_debt      = input.float(na, "Total Debt")
+float cash_equiv      = input.float(na, "Cash & Cash Equivalents")
+float inventory       = input.float(na, "Inventory")
 
 // Operating cash flow (annual)
-float opcf_current_y  = input.float(0.0, "Operating Cash Flow (current year)")
-float opcf_prev_y     = input.float(0.0, "Operating Cash Flow (previous year)")
+float opcf_current_y  = input.float(na, "Operating Cash Flow (current year)")
+float opcf_prev_y     = input.float(na, "Operating Cash Flow (previous year)")
 
 // Auto-fetch toggle: when true, try to pull values from TradingView's
 // financials via `request.financial`. If a fetch returns `na`, the
