@@ -1,5 +1,5 @@
 //@version=6
-indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Screener", overlay=false)
+indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Screener", overlay=true)
 
 // This screener implements the 15 criteria defined in
 // docs/finance/lf-fundementals-screener-algorithm-001-en.md.
@@ -14,6 +14,7 @@ indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Scre
 string market_segment = input.string("YILDIZ", "Market Segment (e.g. YILDIZ)")
 
 // Quarterly series (most recent quarter and previous quarter)
+// (Leave at 0 when auto-fetch is enabled — manual values are only used when auto-fetch is OFF)
 float roe_q           = input.float(0.0, "ROE (most recent quarter)")
 float roe_q_prev      = input.float(0.0, "ROE (previous quarter)")
 
@@ -50,67 +51,85 @@ float opcf_prev_y     = input.float(0.0, "Operating Cash Flow (previous year)")
 // Auto-fetch toggle: when true, try to pull values from TradingView's
 // financials via `request.financial`. If a fetch returns `na`, the
 // script falls back to the manual `input` values above.
+// NOTE: auto_fetch has NO effect on Criterion 1 (Star Market segment).
+// That check always relies on the manual `market_segment` input string.
 bool auto_fetch = input.bool(true, "Auto-fetch fundamentals when available")
 
 // --- Try fetching via request.financial() with reasonable field names ---
 // Note: field availability and exact names vary by symbol and TV plan.
 // We try common field keys and fall back to inputs if missing.
-float f_roe_q            = auto_fetch ? request.financial(syminfo.tickerid, "Q", "return_on_equity") : na
-float roe_q_val          = not na(f_roe_q) ? f_roe_q : roe_q
-float roe_q_prev_val     = not na(f_roe_q[1]) ? f_roe_q[1] : roe_q_prev
+float f_roe_q            = auto_fetch ? request.financial(syminfo.tickerid, "RETURN_ON_EQUITY", "FQ") : na
+float roe_q_prev_fetched = ta.valuewhen(not na(f_roe_q) and not na(f_roe_q[1]) and f_roe_q != f_roe_q[1], f_roe_q[1], 0)
+// When auto_fetch=true, fall back to na (not 0.0) if the API has no data,
+// so the 'data missing' table state shows correctly.
+float roe_q_val          = not na(f_roe_q) ? f_roe_q : (auto_fetch ? na : roe_q)
+float roe_q_prev_val     = not na(roe_q_prev_fetched) ? roe_q_prev_fetched : (auto_fetch ? na : roe_q_prev)
 
-float f_netprofit_q      = auto_fetch ? request.financial(syminfo.tickerid, "Q", "net_income") : na
-float netprofit_q_val    = not na(f_netprofit_q) ? f_netprofit_q : netprofit_q
-float netprofit_q_prev_val = not na(f_netprofit_q[1]) ? f_netprofit_q[1] : netprofit_q_prev
+float f_netprofit_q            = auto_fetch ? request.financial(syminfo.tickerid, "NET_INCOME", "FQ") : na
+float netprofit_q_prev_fetched = ta.valuewhen(not na(f_netprofit_q) and not na(f_netprofit_q[1]) and f_netprofit_q != f_netprofit_q[1], f_netprofit_q[1], 0)
+float netprofit_q_val          = not na(f_netprofit_q) ? f_netprofit_q : (auto_fetch ? na : netprofit_q)
+float netprofit_q_prev_val     = not na(netprofit_q_prev_fetched) ? netprofit_q_prev_fetched : (auto_fetch ? na : netprofit_q_prev)
 
-float f_revenue_q        = auto_fetch ? request.financial(syminfo.tickerid, "Q", "total_revenue") : na
-float revenue_q_val      = not na(f_revenue_q) ? f_revenue_q : revenue_q
-float revenue_q_prev_val = not na(f_revenue_q[1]) ? f_revenue_q[1] : revenue_q_prev
+float f_revenue_q            = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_REVENUE", "FQ") : na
+float revenue_q_prev_fetched = ta.valuewhen(not na(f_revenue_q) and not na(f_revenue_q[1]) and f_revenue_q != f_revenue_q[1], f_revenue_q[1], 0)
+float revenue_q_val          = not na(f_revenue_q) ? f_revenue_q : (auto_fetch ? na : revenue_q)
+float revenue_q_prev_val     = not na(revenue_q_prev_fetched) ? revenue_q_prev_fetched : (auto_fetch ? na : revenue_q_prev)
 
-float f_ebitda_q         = auto_fetch ? request.financial(syminfo.tickerid, "Q", "ebitda") : na
-float ebitda_q_val       = not na(f_ebitda_q) ? f_ebitda_q : ebitda_q
-float ebitda_q_prev_val  = not na(f_ebitda_q[1]) ? f_ebitda_q[1] : ebitda_q_prev
+float f_ebitda_q            = auto_fetch ? request.financial(syminfo.tickerid, "EBITDA", "FQ") : na
+float ebitda_q_prev_fetched = ta.valuewhen(not na(f_ebitda_q) and not na(f_ebitda_q[1]) and f_ebitda_q != f_ebitda_q[1], f_ebitda_q[1], 0)
+float ebitda_q_val          = not na(f_ebitda_q) ? f_ebitda_q : (auto_fetch ? na : ebitda_q)
+float ebitda_q_prev_val     = not na(ebitda_q_prev_fetched) ? ebitda_q_prev_fetched : (auto_fetch ? na : ebitda_q_prev)
+// Annual EBITDA fetched separately for use in Net Debt/EBITDA (c12)
+float f_ebitda_fy           = auto_fetch ? request.financial(syminfo.tickerid, "EBITDA", "FY") : na
 
-float f_operprofit_q     = auto_fetch ? request.financial(syminfo.tickerid, "Q", "operating_income") : na
-float operprofit_q_val   = not na(f_operprofit_q) ? f_operprofit_q : operprofit_q
-float operprofit_q_prev_val = not na(f_operprofit_q[1]) ? f_operprofit_q[1] : operprofit_q_prev
+float f_operprofit_q            = auto_fetch ? request.financial(syminfo.tickerid, "OPER_INCOME", "FQ") : na
+float operprofit_q_prev_fetched = ta.valuewhen(not na(f_operprofit_q) and not na(f_operprofit_q[1]) and f_operprofit_q != f_operprofit_q[1], f_operprofit_q[1], 0)
+float operprofit_q_val          = not na(f_operprofit_q) ? f_operprofit_q : (auto_fetch ? na : operprofit_q)
+float operprofit_q_prev_val     = not na(operprofit_q_prev_fetched) ? operprofit_q_prev_fetched : (auto_fetch ? na : operprofit_q_prev)
 
-float f_eps_q            = auto_fetch ? request.financial(syminfo.tickerid, "Q", "earnings_per_share_basic") : na
-float eps_q_val          = not na(f_eps_q) ? f_eps_q : eps_q
-float eps_q_prev_val     = not na(f_eps_q[1]) ? f_eps_q[1] : eps_q_prev
+float f_eps_q            = auto_fetch ? request.financial(syminfo.tickerid, "EARNINGS_PER_SHARE_BASIC", "FQ") : na
+float eps_q_prev_fetched = ta.valuewhen(not na(f_eps_q) and not na(f_eps_q[1]) and f_eps_q != f_eps_q[1], f_eps_q[1], 0)
+float eps_q_val          = not na(f_eps_q) ? f_eps_q : (auto_fetch ? na : eps_q)
+float eps_q_prev_val     = not na(eps_q_prev_fetched) ? eps_q_prev_fetched : (auto_fetch ? na : eps_q_prev)
 
 // Other fields (try annual/TTM where appropriate)
-float f_free_float       = auto_fetch ? request.financial(syminfo.tickerid, "A", "float_shares_percent") : na
-float free_float_val     = not na(f_free_float) ? f_free_float : free_float
+// Free float ratio = float shares / total shares (no direct percentage field in TV)
+float f_float_shares  = auto_fetch ? request.financial(syminfo.tickerid, "FLOAT_SHARES_OUTSTANDING", "FY") : na
+float f_total_shares  = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_SHARES_OUTSTANDING", "FY") : na
+float f_free_float    = not na(f_float_shares) and not na(f_total_shares) and f_total_shares != 0 ? f_float_shares / f_total_shares : na
+float free_float_val  = not na(f_free_float) ? f_free_float : (auto_fetch ? na : free_float)
 
-float f_peg              = auto_fetch ? request.financial(syminfo.tickerid, "TTM", "price_earnings_to_growth_ttm") : na
-float peg_ratio_val      = not na(f_peg) ? f_peg : peg_ratio
+// PEG ratio is price-based and not available via request.financial(); always use manual input.
+float f_peg         = na
+float peg_ratio_val = not na(f_peg) ? f_peg : (auto_fetch ? na : peg_ratio)
 
-float f_earnings_growth  = auto_fetch ? request.financial(syminfo.tickerid, "A", "net_income_growth") : na
-float earnings_growth_val= not na(f_earnings_growth) ? f_earnings_growth : earnings_growth
+// 'net_income_growth' is not a documented TradingView field and silently returns na.
+// Compute annual earnings growth directly from annual net income instead.
+float f_netincome_fy      = auto_fetch ? request.financial(syminfo.tickerid, "NET_INCOME", "FY") : na
+float f_netincome_fy_prev = ta.valuewhen(not na(f_netincome_fy) and not na(f_netincome_fy[1]) and f_netincome_fy != f_netincome_fy[1], f_netincome_fy[1], 0)
+float f_earnings_growth   = not na(f_netincome_fy) and not na(f_netincome_fy_prev) and f_netincome_fy_prev != 0 ? (f_netincome_fy - f_netincome_fy_prev) / math.abs(f_netincome_fy_prev) * 100 : na
+float earnings_growth_val = not na(f_earnings_growth) ? f_earnings_growth : (auto_fetch ? na : earnings_growth)
 
-float f_current_assets   = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_current_assets") : na
-float current_assets_val = not na(f_current_assets) ? f_current_assets : current_assets
+float f_current_assets   = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_CURRENT_ASSETS", "FQ") : na
+float current_assets_val = not na(f_current_assets) ? f_current_assets : (auto_fetch ? na : current_assets)
 
-float f_current_liab     = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_current_liabilities") : na
-float current_liab_val   = not na(f_current_liab) ? f_current_liab : current_liab
+float f_current_liab     = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_CURRENT_LIABILITIES", "FQ") : na
+float current_liab_val   = not na(f_current_liab) ? f_current_liab : (auto_fetch ? na : current_liab)
 
-float f_total_debt       = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_debt") : na
-float total_debt_val     = not na(f_total_debt) ? f_total_debt : total_debt
+float f_total_debt       = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_DEBT", "FQ") : na
+float total_debt_val     = not na(f_total_debt) ? f_total_debt : (auto_fetch ? na : total_debt)
 
-float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "A", "cash_and_cash_equivalents") : na
-float cash_equiv_val     = not na(f_cash_equiv) ? f_cash_equiv : cash_equiv
+float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "CASH_N_EQUIVALENTS", "FQ") : na
+float cash_equiv_val     = not na(f_cash_equiv) ? f_cash_equiv : (auto_fetch ? na : cash_equiv)
 
-float f_inventory        = auto_fetch ? request.financial(syminfo.tickerid, "A", "inventory") : na
-float inventory_val      = not na(f_inventory) ? f_inventory : inventory
+float f_inventory        = auto_fetch ? request.financial(syminfo.tickerid, "TOTAL_INVENTORY", "FQ") : na
+float inventory_val      = not na(f_inventory) ? f_inventory : (auto_fetch ? na : inventory)
 
-float f_opcf_current_y   = auto_fetch ? request.financial(syminfo.tickerid, "FY", "cash_from_operations_annual") : na
-float opcf_current_y_val = not na(f_opcf_current_y) ? f_opcf_current_y : opcf_current_y
-float opcf_prev_y_val    = not na(f_opcf_current_y[1]) ? f_opcf_current_y[1] : opcf_prev_y
+float f_opcf_current_y    = auto_fetch ? request.financial(syminfo.tickerid, "CASH_F_OPERATING_ACTIVITIES", "FY") : na
+float opcf_prev_y_fetched = ta.valuewhen(not na(f_opcf_current_y) and not na(f_opcf_current_y[1]) and f_opcf_current_y != f_opcf_current_y[1], f_opcf_current_y[1], 0)
+float opcf_current_y_val  = not na(f_opcf_current_y) ? f_opcf_current_y : (auto_fetch ? na : opcf_current_y)
+float opcf_prev_y_val     = not na(opcf_prev_y_fetched) ? opcf_prev_y_fetched : (auto_fetch ? na : opcf_prev_y)
 
-
-// --- Helper guards ---
-is_non_na(x) => not na(x)
 
 // Criterion checks (booleans). Any `na` inputs cause the specific check
 // to evaluate to `false` (conservative default). Users can replace inputs
@@ -120,63 +139,75 @@ is_non_na(x) => not na(x)
 c1 = str.upper(market_segment) == "YILDIZ" or str.upper(market_segment) == "YLDIZ"
 
 // 2 — Quarterly Increasing ROE
-c2 = is_non_na(roe_q_val) and is_non_na(roe_q_prev_val) and (roe_q_val > roe_q_prev_val)
+c2 = not na(roe_q_val) and not na(roe_q_prev_val) and (roe_q_val > roe_q_prev_val)
 
 // 3 — Quarterly Increasing Net Profit
-c3 = is_non_na(netprofit_q_val) and is_non_na(netprofit_q_prev_val) and (netprofit_q_val > netprofit_q_prev_val)
+c3 = not na(netprofit_q_val) and not na(netprofit_q_prev_val) and (netprofit_q_val > netprofit_q_prev_val)
 
 // 4 — Quarterly Increasing Revenue
-c4 = is_non_na(revenue_q_val) and is_non_na(revenue_q_prev_val) and (revenue_q_val > revenue_q_prev_val)
+c4 = not na(revenue_q_val) and not na(revenue_q_prev_val) and (revenue_q_val > revenue_q_prev_val)
 
 // 5 — Quarterly Increasing EBITDA
-c5 = is_non_na(ebitda_q_val) and is_non_na(ebitda_q_prev_val) and (ebitda_q_val > ebitda_q_prev_val)
+c5 = not na(ebitda_q_val) and not na(ebitda_q_prev_val) and (ebitda_q_val > ebitda_q_prev_val)
 
 // 6 — Quarterly Increasing EBITDA Margin
-ebitda_margin_q      = is_non_na(ebitda_q_val) and is_non_na(revenue_q_val) and (revenue_q_val != 0) ? ebitda_q_val / revenue_q_val : na
-ebitda_margin_q_prev = is_non_na(ebitda_q_prev_val) and is_non_na(revenue_q_prev_val) and (revenue_q_prev_val != 0) ? ebitda_q_prev_val / revenue_q_prev_val : na
-c6 = is_non_na(ebitda_margin_q) and is_non_na(ebitda_margin_q_prev) and (ebitda_margin_q > ebitda_margin_q_prev)
+ebitda_margin_q      = not na(ebitda_q_val) and not na(revenue_q_val) and (revenue_q_val != 0) ? ebitda_q_val / revenue_q_val : na
+ebitda_margin_q_prev = not na(ebitda_q_prev_val) and not na(revenue_q_prev_val) and (revenue_q_prev_val != 0) ? ebitda_q_prev_val / revenue_q_prev_val : na
+c6 = not na(ebitda_margin_q) and not na(ebitda_margin_q_prev) and (ebitda_margin_q > ebitda_margin_q_prev)
 
 // 7 — Quarterly Increasing Operating Profit
-c7 = is_non_na(operprofit_q_val) and is_non_na(operprofit_q_prev_val) and (operprofit_q_val > operprofit_q_prev_val)
+c7 = not na(operprofit_q_val) and not na(operprofit_q_prev_val) and (operprofit_q_val > operprofit_q_prev_val)
 
 // 8 — Quarterly Increasing EPS
-c8 = is_non_na(eps_q_val) and is_non_na(eps_q_prev_val) and (eps_q_val > eps_q_prev_val)
+c8 = not na(eps_q_val) and not na(eps_q_prev_val) and (eps_q_val > eps_q_prev_val)
 
 // 9 — Free Float Rate Below 70%
-c9 = is_non_na(free_float_val) and (free_float_val < 0.70)
+c9 = not na(free_float_val) and (free_float_val < 0.70)
 
 // 10 — PEG Ratio Below 1 (only when earnings growth > 0)
-c10 = is_non_na(peg_ratio_val) and is_non_na(earnings_growth_val) and (earnings_growth_val > 0) and (peg_ratio_val < 1.0)
+c10 = not na(peg_ratio_val) and not na(earnings_growth_val) and (earnings_growth_val > 0) and (peg_ratio_val < 1.0)
 
 // 11 — Current Ratio Between 1 and 3
-curr_ratio = is_non_na(current_assets_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? current_assets_val / current_liab_val : na
-c11 = is_non_na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
+curr_ratio = not na(current_assets_val) and not na(current_liab_val) and (current_liab_val != 0) ? current_assets_val / current_liab_val : na
+c11 = not na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
 
 // 12 — Net Debt / EBITDA Below 3
-net_debt = is_non_na(total_debt_val) and is_non_na(cash_equiv_val) ? (total_debt_val - cash_equiv_val) : na
-// Annualize EBITDA if quarterly input is provided
-ebitda_annual = is_non_na(ebitda_q_val) ? ebitda_q_val * 4.0 : na
+net_debt = not na(total_debt_val) and not na(cash_equiv_val) ? (total_debt_val - cash_equiv_val) : na
+// Prefer fetched annual EBITDA; fall back to quarterly * 4 as a rough estimate only
+ebitda_annual = not na(f_ebitda_fy) ? f_ebitda_fy : (not na(ebitda_q_val) ? ebitda_q_val * 4.0 : na)
 c12 = false
-if is_non_na(net_debt)
-    if is_non_na(ebitda_annual) and (ebitda_annual > 0)
+if not na(net_debt)
+    if not na(ebitda_annual) and (ebitda_annual > 0)
         c12 := (net_debt / ebitda_annual) < 3.0
     else
         // Negative net debt (more cash than debt) passes automatically
         c12 := net_debt < 0
 
 // 13 — Cash Ratio Above 0.2
-cash_ratio = is_non_na(cash_equiv_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? cash_equiv_val / current_liab_val : na
-c13 = is_non_na(cash_ratio) and (cash_ratio > 0.20)
+cash_ratio = not na(cash_equiv_val) and not na(current_liab_val) and (current_liab_val != 0) ? cash_equiv_val / current_liab_val : na
+c13 = not na(cash_ratio) and (cash_ratio > 0.20)
 
 // 14 — Quick Ratio Between 0.5 and 2
-quick_ratio = is_non_na(current_assets_val) and is_non_na(inventory_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? (current_assets_val - inventory_val) / current_liab_val : na
-c14 = is_non_na(quick_ratio) and (quick_ratio >= 0.5) and (quick_ratio <= 2.0)
+quick_ratio = not na(current_assets_val) and not na(inventory_val) and not na(current_liab_val) and (current_liab_val != 0) ? (current_assets_val - inventory_val) / current_liab_val : na
+c14 = not na(quick_ratio) and (quick_ratio >= 0.5) and (quick_ratio <= 2.0)
 
 // 15 — Positive Year-over-Year Operating Cash Flow Growth
-c15 = is_non_na(opcf_current_y_val) and is_non_na(opcf_prev_y_val) and (opcf_current_y_val > opcf_prev_y_val)
+c15 = not na(opcf_current_y_val) and not na(opcf_prev_y_val) and (opcf_current_y_val > opcf_prev_y_val)
 
 // Overall result: require all criteria to be true
 all_pass = c1 and c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9 and c10 and c11 and c12 and c13 and c14 and c15
+
+// Helper functions for the results table.
+// cellText: "✔" pass | "✖" fail | "—" data missing
+// cellColor: green   | red       | gray
+cellText(bool pass, bool dataOk) =>
+    dataOk ? (pass ? "✔" : "✖") : "—"
+cellColor(bool pass, bool dataOk) =>
+    dataOk ? (pass ? color.green : color.red) : color.gray
+// fmtV: format a single float for display (4 significant decimals)
+fmtV(float v) => na(v) ? "—" : str.tostring(v, "#.####")
+// fmtPair: show "current | previous" for q/q comparisons
+fmtPair(float cur, float prev) => fmtV(cur) + " | " + fmtV(prev)
 
 // --- Visualization ---
 // One-line status on the chart: PASS/FAIL
@@ -186,59 +217,90 @@ if barstate.islast
     labelColor = all_pass ? color.new(color.green, 0) : color.new(color.red, 0)
     if not na(statusLbl)
         label.delete(statusLbl)
-    statusLbl := label.new(bar_index, high, statusText, color=labelColor, textcolor=color.white, style=label.style_label_down)
+    statusLbl := label.new(bar_index, close, statusText, color=labelColor, textcolor=color.white, style=label.style_label_down, yloc=yloc.price)
 
 // Table showing each criterion and its boolean result (only on final bar)
-var table t = table.new(position.top_right, 2, 16, border_width=1)
+var table t = table.new(position.top_right, 3, 16, border_width=1)
 if barstate.islast
     // Header
-    table.cell(t, 0, 0, "Criterion", text_color=color.white, bgcolor=color.new(color.blue, 10))
-    table.cell(t, 1, 0, "Pass", text_color=color.white, bgcolor=color.new(color.blue, 10))
+    table.cell(t, 0, 0, "Criterion",  text_color=color.white, bgcolor=color.new(color.blue, 10))
+    table.cell(t, 1, 0, "Pass",       text_color=color.white, bgcolor=color.new(color.blue, 10))
+    table.cell(t, 2, 0, "Values (cur | prev)", text_color=color.white, bgcolor=color.new(color.blue, 10))
 
     // Rows (1..15)
     table.cell(t, 0, 1, "1 — Star Market")
-    table.cell(t, 1, 1, c1 ? "✔" : "✖", text_color = c1 ? color.green : color.red)
+    table.cell(t, 1, 1, cellText(c1, true), text_color=cellColor(c1, true))
+    table.cell(t, 2, 1, market_segment)
 
+    bool d2 = not na(roe_q_val) and not na(roe_q_prev_val)
     table.cell(t, 0, 2, "2 — ROE ↑ q/q")
-    table.cell(t, 1, 2, c2 ? "✔" : "✖", text_color = c2 ? color.green : color.red)
+    table.cell(t, 1, 2, cellText(c2, d2), text_color=cellColor(c2, d2))
+    table.cell(t, 2, 2, fmtPair(roe_q_val, roe_q_prev_val))
 
+    bool d3 = not na(netprofit_q_val) and not na(netprofit_q_prev_val)
     table.cell(t, 0, 3, "3 — Net Profit ↑ q/q")
-    table.cell(t, 1, 3, c3 ? "✔" : "✖", text_color = c3 ? color.green : color.red)
+    table.cell(t, 1, 3, cellText(c3, d3), text_color=cellColor(c3, d3))
+    table.cell(t, 2, 3, fmtPair(netprofit_q_val, netprofit_q_prev_val))
 
+    bool d4 = not na(revenue_q_val) and not na(revenue_q_prev_val)
     table.cell(t, 0, 4, "4 — Revenue ↑ q/q")
-    table.cell(t, 1, 4, c4 ? "✔" : "✖", text_color = c4 ? color.green : color.red)
+    table.cell(t, 1, 4, cellText(c4, d4), text_color=cellColor(c4, d4))
+    table.cell(t, 2, 4, fmtPair(revenue_q_val, revenue_q_prev_val))
 
+    bool d5 = not na(ebitda_q_val) and not na(ebitda_q_prev_val)
     table.cell(t, 0, 5, "5 — EBITDA ↑ q/q")
-    table.cell(t, 1, 5, c5 ? "✔" : "✖", text_color = c5 ? color.green : color.red)
+    table.cell(t, 1, 5, cellText(c5, d5), text_color=cellColor(c5, d5))
+    table.cell(t, 2, 5, fmtPair(ebitda_q_val, ebitda_q_prev_val))
 
+    bool d6 = d5 and d4
     table.cell(t, 0, 6, "6 — EBITDA Margin ↑ q/q")
-    table.cell(t, 1, 6, c6 ? "✔" : "✖", text_color = c6 ? color.green : color.red)
+    table.cell(t, 1, 6, cellText(c6, d6), text_color=cellColor(c6, d6))
+    table.cell(t, 2, 6, fmtPair(ebitda_margin_q, ebitda_margin_q_prev))
 
+    bool d7 = not na(operprofit_q_val) and not na(operprofit_q_prev_val)
     table.cell(t, 0, 7, "7 — Operating Profit ↑ q/q")
-    table.cell(t, 1, 7, c7 ? "✔" : "✖", text_color = c7 ? color.green : color.red)
+    table.cell(t, 1, 7, cellText(c7, d7), text_color=cellColor(c7, d7))
+    table.cell(t, 2, 7, fmtPair(operprofit_q_val, operprofit_q_prev_val))
 
+    bool d8 = not na(eps_q_val) and not na(eps_q_prev_val)
     table.cell(t, 0, 8, "8 — EPS ↑ q/q")
-    table.cell(t, 1, 8, c8 ? "✔" : "✖", text_color = c8 ? color.green : color.red)
+    table.cell(t, 1, 8, cellText(c8, d8), text_color=cellColor(c8, d8))
+    table.cell(t, 2, 8, fmtPair(eps_q_val, eps_q_prev_val))
 
+    bool d9 = not na(free_float_val)
     table.cell(t, 0, 9, "9 — Free Float < 70%")
-    table.cell(t, 1, 9, c9 ? "✔" : "✖", text_color = c9 ? color.green : color.red)
+    table.cell(t, 1, 9, cellText(c9, d9), text_color=cellColor(c9, d9))
+    table.cell(t, 2, 9, fmtV(free_float_val))
 
+    bool d10 = not na(peg_ratio_val) and not na(earnings_growth_val)
     table.cell(t, 0, 10, "10 — PEG < 1 (growth>0)")
-    table.cell(t, 1, 10, c10 ? "✔" : "✖", text_color = c10 ? color.green : color.red)
+    table.cell(t, 1, 10, cellText(c10, d10), text_color=cellColor(c10, d10))
+    table.cell(t, 2, 10, "PEG " + fmtV(peg_ratio_val) + " / g% " + fmtV(earnings_growth_val))
 
+    bool d11 = not na(current_assets_val) and not na(current_liab_val)
     table.cell(t, 0, 11, "11 — Current Ratio 1..3")
-    table.cell(t, 1, 11, c11 ? "✔" : "✖", text_color = c11 ? color.green : color.red)
+    table.cell(t, 1, 11, cellText(c11, d11), text_color=cellColor(c11, d11))
+    table.cell(t, 2, 11, fmtV(curr_ratio))
 
+    bool d12 = not na(total_debt_val) and not na(cash_equiv_val) and not na(ebitda_annual)
+    float nd_ebitda = not na(net_debt) and not na(ebitda_annual) and ebitda_annual != 0 ? net_debt / ebitda_annual : na
     table.cell(t, 0, 12, "12 — Net Debt / EBITDA < 3")
-    table.cell(t, 1, 12, c12 ? "✔" : "✖", text_color = c12 ? color.green : color.red)
+    table.cell(t, 1, 12, cellText(c12, d12), text_color=cellColor(c12, d12))
+    table.cell(t, 2, 12, "ND " + fmtV(net_debt) + " / " + fmtV(nd_ebitda))
 
+    bool d13 = not na(cash_equiv_val) and not na(current_liab_val)
     table.cell(t, 0, 13, "13 — Cash Ratio > 0.2")
-    table.cell(t, 1, 13, c13 ? "✔" : "✖", text_color = c13 ? color.green : color.red)
+    table.cell(t, 1, 13, cellText(c13, d13), text_color=cellColor(c13, d13))
+    table.cell(t, 2, 13, fmtV(cash_ratio))
 
+    bool d14 = not na(current_assets_val) and not na(inventory_val) and not na(current_liab_val)
     table.cell(t, 0, 14, "14 — Quick Ratio 0.5..2")
-    table.cell(t, 1, 14, c14 ? "✔" : "✖", text_color = c14 ? color.green : color.red)
+    table.cell(t, 1, 14, cellText(c14, d14), text_color=cellColor(c14, d14))
+    table.cell(t, 2, 14, fmtV(quick_ratio))
 
+    bool d15 = not na(opcf_current_y_val) and not na(opcf_prev_y_val)
     table.cell(t, 0, 15, "15 — OCF YoY > 0")
-    table.cell(t, 1, 15, c15 ? "✔" : "✖", text_color = c15 ? color.green : color.red)
+    table.cell(t, 1, 15, cellText(c15, d15), text_color=cellColor(c15, d15))
+    table.cell(t, 2, 15, fmtPair(opcf_current_y_val, opcf_prev_y_val))
 
 // End of screener
