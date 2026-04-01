@@ -1,5 +1,5 @@
 //@version=6
-indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Screener", overlay=false)
+indicator("LF Fundamentals Screener — Algorithm 001", shorttitle="LF MCSA Screener", overlay=true)
 
 // This screener implements the 15 criteria defined in
 // docs/finance/lf-fundementals-screener-algorithm-001-en.md.
