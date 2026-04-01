@@ -199,7 +199,7 @@ if barstate.islast
     labelColor = all_pass ? color.new(color.green, 0) : color.new(color.red, 0)
     if not na(statusLbl)
         label.delete(statusLbl)
-    statusLbl := label.new(bar_index, high, statusText, color=labelColor, textcolor=color.white, style=label.style_label_down)
+    statusLbl := label.new(bar_index, close, statusText, color=labelColor, textcolor=color.white, style=label.style_label_down, yloc=yloc.price)
 
 // Table showing each criterion and its boolean result (only on final bar)
 var table t = table.new(position.top_right, 2, 16, border_width=1)
