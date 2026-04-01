@@ -50,6 +50,8 @@ float opcf_prev_y     = input.float(0.0, "Operating Cash Flow (previous year)")
 // Auto-fetch toggle: when true, try to pull values from TradingView's
 // financials via `request.financial`. If a fetch returns `na`, the
 // script falls back to the manual `input` values above.
+// NOTE: auto_fetch has NO effect on Criterion 1 (Star Market segment).
+// That check always relies on the manual `market_segment` input string.
 bool auto_fetch = input.bool(true, "Auto-fetch fundamentals when available")
 
 // --- Try fetching via request.financial() with reasonable field names ---
