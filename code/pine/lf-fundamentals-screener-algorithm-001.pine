@@ -55,56 +55,56 @@ bool auto_fetch = input.bool(true, "Auto-fetch fundamentals when available")
 // --- Try fetching via request.financial() with reasonable field names ---
 // Note: field availability and exact names vary by symbol and TV plan.
 // We try common field keys and fall back to inputs if missing.
-float f_roe_q            = auto_fetch ? request.financial(syminfo.tickerid, "Q", "return_on_equity") : na
+float f_roe_q            = auto_fetch ? request.financial(syminfo.tickerid, "return_on_equity", "FQ") : na
 float roe_q_val          = not na(f_roe_q) ? f_roe_q : roe_q
 float roe_q_prev_val     = not na(f_roe_q[1]) ? f_roe_q[1] : roe_q_prev
 
-float f_netprofit_q      = auto_fetch ? request.financial(syminfo.tickerid, "Q", "net_income") : na
+float f_netprofit_q      = auto_fetch ? request.financial(syminfo.tickerid, "net_income", "FQ") : na
 float netprofit_q_val    = not na(f_netprofit_q) ? f_netprofit_q : netprofit_q
 float netprofit_q_prev_val = not na(f_netprofit_q[1]) ? f_netprofit_q[1] : netprofit_q_prev
 
-float f_revenue_q        = auto_fetch ? request.financial(syminfo.tickerid, "Q", "total_revenue") : na
+float f_revenue_q        = auto_fetch ? request.financial(syminfo.tickerid, "total_revenue", "FQ") : na
 float revenue_q_val      = not na(f_revenue_q) ? f_revenue_q : revenue_q
 float revenue_q_prev_val = not na(f_revenue_q[1]) ? f_revenue_q[1] : revenue_q_prev
 
-float f_ebitda_q         = auto_fetch ? request.financial(syminfo.tickerid, "Q", "ebitda") : na
+float f_ebitda_q         = auto_fetch ? request.financial(syminfo.tickerid, "ebitda", "FQ") : na
 float ebitda_q_val       = not na(f_ebitda_q) ? f_ebitda_q : ebitda_q
 float ebitda_q_prev_val  = not na(f_ebitda_q[1]) ? f_ebitda_q[1] : ebitda_q_prev
 
-float f_operprofit_q     = auto_fetch ? request.financial(syminfo.tickerid, "Q", "operating_income") : na
+float f_operprofit_q     = auto_fetch ? request.financial(syminfo.tickerid, "operating_income", "FQ") : na
 float operprofit_q_val   = not na(f_operprofit_q) ? f_operprofit_q : operprofit_q
 float operprofit_q_prev_val = not na(f_operprofit_q[1]) ? f_operprofit_q[1] : operprofit_q_prev
 
-float f_eps_q            = auto_fetch ? request.financial(syminfo.tickerid, "Q", "earnings_per_share_basic") : na
+float f_eps_q            = auto_fetch ? request.financial(syminfo.tickerid, "earnings_per_share_basic", "FQ") : na
 float eps_q_val          = not na(f_eps_q) ? f_eps_q : eps_q
 float eps_q_prev_val     = not na(f_eps_q[1]) ? f_eps_q[1] : eps_q_prev
 
 // Other fields (try annual/TTM where appropriate)
-float f_free_float       = auto_fetch ? request.financial(syminfo.tickerid, "A", "float_shares_percent") : na
+float f_free_float       = auto_fetch ? request.financial(syminfo.tickerid, "float_shares_percent", "FY") : na
 float free_float_val     = not na(f_free_float) ? f_free_float : free_float
 
-float f_peg              = auto_fetch ? request.financial(syminfo.tickerid, "TTM", "price_earnings_to_growth_ttm") : na
+float f_peg              = auto_fetch ? request.financial(syminfo.tickerid, "price_earnings_to_growth_ttm", "TTM") : na
 float peg_ratio_val      = not na(f_peg) ? f_peg : peg_ratio
 
-float f_earnings_growth  = auto_fetch ? request.financial(syminfo.tickerid, "A", "net_income_growth") : na
+float f_earnings_growth  = auto_fetch ? request.financial(syminfo.tickerid, "net_income_growth", "FY") : na
 float earnings_growth_val= not na(f_earnings_growth) ? f_earnings_growth : earnings_growth
 
-float f_current_assets   = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_current_assets") : na
+float f_current_assets   = auto_fetch ? request.financial(syminfo.tickerid, "total_current_assets", "FQ") : na
 float current_assets_val = not na(f_current_assets) ? f_current_assets : current_assets
 
-float f_current_liab     = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_current_liabilities") : na
+float f_current_liab     = auto_fetch ? request.financial(syminfo.tickerid, "total_current_liabilities", "FQ") : na
 float current_liab_val   = not na(f_current_liab) ? f_current_liab : current_liab
 
-float f_total_debt       = auto_fetch ? request.financial(syminfo.tickerid, "A", "total_debt") : na
+float f_total_debt       = auto_fetch ? request.financial(syminfo.tickerid, "total_debt", "FQ") : na
 float total_debt_val     = not na(f_total_debt) ? f_total_debt : total_debt
 
-float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "A", "cash_and_cash_equivalents") : na
+float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "cash_and_cash_equivalents", "FQ") : na
 float cash_equiv_val     = not na(f_cash_equiv) ? f_cash_equiv : cash_equiv
 
-float f_inventory        = auto_fetch ? request.financial(syminfo.tickerid, "A", "inventory") : na
+float f_inventory        = auto_fetch ? request.financial(syminfo.tickerid, "inventory", "FQ") : na
 float inventory_val      = not na(f_inventory) ? f_inventory : inventory
 
-float f_opcf_current_y   = auto_fetch ? request.financial(syminfo.tickerid, "FY", "cash_from_operations_annual") : na
+float f_opcf_current_y   = auto_fetch ? request.financial(syminfo.tickerid, "cash_from_operations_annual", "FY") : na
 float opcf_current_y_val = not na(f_opcf_current_y) ? f_opcf_current_y : opcf_current_y
 float opcf_prev_y_val    = not na(f_opcf_current_y[1]) ? f_opcf_current_y[1] : opcf_prev_y
 
