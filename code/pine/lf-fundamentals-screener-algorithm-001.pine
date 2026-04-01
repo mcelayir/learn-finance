@@ -104,7 +104,7 @@ float current_liab_val   = not na(f_current_liab) ? f_current_liab : current_lia
 float f_total_debt       = auto_fetch ? request.financial(syminfo.tickerid, "total_debt", "FQ") : na
 float total_debt_val     = not na(f_total_debt) ? f_total_debt : total_debt
 
-float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "cash_and_cash_equivalents", "FQ") : na
+float f_cash_equiv       = auto_fetch ? request.financial(syminfo.tickerid, "cash_and_equivalents", "FQ") : na
 float cash_equiv_val     = not na(f_cash_equiv) ? f_cash_equiv : cash_equiv
 
 float f_inventory        = auto_fetch ? request.financial(syminfo.tickerid, "inventory", "FQ") : na
