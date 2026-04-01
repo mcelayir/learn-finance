@@ -204,54 +204,75 @@ if barstate.islast
 // Table showing each criterion and its boolean result (only on final bar)
 var table t = table.new(position.top_right, 2, 16, border_width=1)
 if barstate.islast
+    // Helper: returns "✔" / "✖" / "—" and the matching colour.
+    // dataOk = false means required inputs are na → show "—" in grey.
+    cellText(bool pass, bool dataOk) =>
+        dataOk ? (pass ? "✔" : "✖") : "—"
+    cellColor(bool pass, bool dataOk) =>
+        dataOk ? (pass ? color.green : color.red) : color.gray
+
     // Header
     table.cell(t, 0, 0, "Criterion", text_color=color.white, bgcolor=color.new(color.blue, 10))
     table.cell(t, 1, 0, "Pass", text_color=color.white, bgcolor=color.new(color.blue, 10))
 
     // Rows (1..15)
     table.cell(t, 0, 1, "1 — Star Market")
-    table.cell(t, 1, 1, c1 ? "✔" : "✖", text_color = c1 ? color.green : color.red)
+    table.cell(t, 1, 1, cellText(c1, true), text_color=cellColor(c1, true))
 
+    bool d2 = not na(roe_q_val) and not na(roe_q_prev_val)
     table.cell(t, 0, 2, "2 — ROE ↑ q/q")
-    table.cell(t, 1, 2, c2 ? "✔" : "✖", text_color = c2 ? color.green : color.red)
+    table.cell(t, 1, 2, cellText(c2, d2), text_color=cellColor(c2, d2))
 
+    bool d3 = not na(netprofit_q_val) and not na(netprofit_q_prev_val)
     table.cell(t, 0, 3, "3 — Net Profit ↑ q/q")
-    table.cell(t, 1, 3, c3 ? "✔" : "✖", text_color = c3 ? color.green : color.red)
+    table.cell(t, 1, 3, cellText(c3, d3), text_color=cellColor(c3, d3))
 
+    bool d4 = not na(revenue_q_val) and not na(revenue_q_prev_val)
     table.cell(t, 0, 4, "4 — Revenue ↑ q/q")
-    table.cell(t, 1, 4, c4 ? "✔" : "✖", text_color = c4 ? color.green : color.red)
+    table.cell(t, 1, 4, cellText(c4, d4), text_color=cellColor(c4, d4))
 
+    bool d5 = not na(ebitda_q_val) and not na(ebitda_q_prev_val)
     table.cell(t, 0, 5, "5 — EBITDA ↑ q/q")
-    table.cell(t, 1, 5, c5 ? "✔" : "✖", text_color = c5 ? color.green : color.red)
+    table.cell(t, 1, 5, cellText(c5, d5), text_color=cellColor(c5, d5))
 
+    bool d6 = d5 and d4
     table.cell(t, 0, 6, "6 — EBITDA Margin ↑ q/q")
-    table.cell(t, 1, 6, c6 ? "✔" : "✖", text_color = c6 ? color.green : color.red)
+    table.cell(t, 1, 6, cellText(c6, d6), text_color=cellColor(c6, d6))
 
+    bool d7 = not na(operprofit_q_val) and not na(operprofit_q_prev_val)
     table.cell(t, 0, 7, "7 — Operating Profit ↑ q/q")
-    table.cell(t, 1, 7, c7 ? "✔" : "✖", text_color = c7 ? color.green : color.red)
+    table.cell(t, 1, 7, cellText(c7, d7), text_color=cellColor(c7, d7))
 
+    bool d8 = not na(eps_q_val) and not na(eps_q_prev_val)
     table.cell(t, 0, 8, "8 — EPS ↑ q/q")
-    table.cell(t, 1, 8, c8 ? "✔" : "✖", text_color = c8 ? color.green : color.red)
+    table.cell(t, 1, 8, cellText(c8, d8), text_color=cellColor(c8, d8))
 
+    bool d9 = not na(free_float_val)
     table.cell(t, 0, 9, "9 — Free Float < 70%")
-    table.cell(t, 1, 9, c9 ? "✔" : "✖", text_color = c9 ? color.green : color.red)
+    table.cell(t, 1, 9, cellText(c9, d9), text_color=cellColor(c9, d9))
 
+    bool d10 = not na(peg_ratio_val) and not na(earnings_growth_val)
     table.cell(t, 0, 10, "10 — PEG < 1 (growth>0)")
-    table.cell(t, 1, 10, c10 ? "✔" : "✖", text_color = c10 ? color.green : color.red)
+    table.cell(t, 1, 10, cellText(c10, d10), text_color=cellColor(c10, d10))
 
+    bool d11 = not na(current_assets_val) and not na(current_liab_val)
     table.cell(t, 0, 11, "11 — Current Ratio 1..3")
-    table.cell(t, 1, 11, c11 ? "✔" : "✖", text_color = c11 ? color.green : color.red)
+    table.cell(t, 1, 11, cellText(c11, d11), text_color=cellColor(c11, d11))
 
+    bool d12 = not na(total_debt_val) and not na(cash_equiv_val) and not na(ebitda_annual)
     table.cell(t, 0, 12, "12 — Net Debt / EBITDA < 3")
-    table.cell(t, 1, 12, c12 ? "✔" : "✖", text_color = c12 ? color.green : color.red)
+    table.cell(t, 1, 12, cellText(c12, d12), text_color=cellColor(c12, d12))
 
+    bool d13 = not na(cash_equiv_val) and not na(current_liab_val)
     table.cell(t, 0, 13, "13 — Cash Ratio > 0.2")
-    table.cell(t, 1, 13, c13 ? "✔" : "✖", text_color = c13 ? color.green : color.red)
+    table.cell(t, 1, 13, cellText(c13, d13), text_color=cellColor(c13, d13))
 
+    bool d14 = not na(current_assets_val) and not na(inventory_val) and not na(current_liab_val)
     table.cell(t, 0, 14, "14 — Quick Ratio 0.5..2")
-    table.cell(t, 1, 14, c14 ? "✔" : "✖", text_color = c14 ? color.green : color.red)
+    table.cell(t, 1, 14, cellText(c14, d14), text_color=cellColor(c14, d14))
 
+    bool d15 = not na(opcf_current_y_val) and not na(opcf_prev_y_val)
     table.cell(t, 0, 15, "15 — OCF YoY > 0")
-    table.cell(t, 1, 15, c15 ? "✔" : "✖", text_color = c15 ? color.green : color.red)
+    table.cell(t, 1, 15, cellText(c15, d15), text_color=cellColor(c15, d15))
 
 // End of screener
