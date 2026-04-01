@@ -74,6 +74,8 @@ float f_ebitda_q            = auto_fetch ? request.financial(syminfo.tickerid, "
 float ebitda_q_prev_fetched = ta.valuewhen(not na(f_ebitda_q) and not na(f_ebitda_q[1]) and f_ebitda_q != f_ebitda_q[1], f_ebitda_q[1], 0)
 float ebitda_q_val          = not na(f_ebitda_q) ? f_ebitda_q : ebitda_q
 float ebitda_q_prev_val     = not na(ebitda_q_prev_fetched) ? ebitda_q_prev_fetched : ebitda_q_prev
+// Annual EBITDA fetched separately for use in Net Debt/EBITDA (c12)
+float f_ebitda_fy           = auto_fetch ? request.financial(syminfo.tickerid, "ebitda", "FY") : na
 
 float f_operprofit_q            = auto_fetch ? request.financial(syminfo.tickerid, "operating_income", "FQ") : na
 float operprofit_q_prev_fetched = ta.valuewhen(not na(f_operprofit_q) and not na(f_operprofit_q[1]) and f_operprofit_q != f_operprofit_q[1], f_operprofit_q[1], 0)
@@ -166,8 +168,8 @@ c11 = is_non_na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
 
 // 12 — Net Debt / EBITDA Below 3
 net_debt = is_non_na(total_debt_val) and is_non_na(cash_equiv_val) ? (total_debt_val - cash_equiv_val) : na
-// Annualize EBITDA if quarterly input is provided
-ebitda_annual = is_non_na(ebitda_q_val) ? ebitda_q_val * 4.0 : na
+// Prefer fetched annual EBITDA; fall back to quarterly * 4 as a rough estimate only
+ebitda_annual = not na(f_ebitda_fy) ? f_ebitda_fy : (is_non_na(ebitda_q_val) ? ebitda_q_val * 4.0 : na)
 c12 = false
 if is_non_na(net_debt)
     if is_non_na(ebitda_annual) and (ebitda_annual > 0)
