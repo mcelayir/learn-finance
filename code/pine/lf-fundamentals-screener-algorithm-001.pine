@@ -100,8 +100,7 @@ float peg_ratio_val      = not na(f_peg) ? f_peg : peg_ratio
 // Compute annual earnings growth directly from annual net income instead.
 float f_netincome_fy      = auto_fetch ? request.financial(syminfo.tickerid, "net_income", "FY") : na
 float f_netincome_fy_prev = ta.valuewhen(not na(f_netincome_fy) and not na(f_netincome_fy[1]) and f_netincome_fy != f_netincome_fy[1], f_netincome_fy[1], 0)
-float f_earnings_growth   = not na(f_netincome_fy) and not na(f_netincome_fy_prev) and f_netincome_fy_prev != 0 ?
-                            (f_netincome_fy - f_netincome_fy_prev) / math.abs(f_netincome_fy_prev) * 100 : na
+float f_earnings_growth   = not na(f_netincome_fy) and not na(f_netincome_fy_prev) and f_netincome_fy_prev != 0 ? (f_netincome_fy - f_netincome_fy_prev) / math.abs(f_netincome_fy_prev) * 100 : na
 float earnings_growth_val = not na(f_earnings_growth) ? f_earnings_growth : earnings_growth
 
 float f_current_assets   = auto_fetch ? request.financial(syminfo.tickerid, "total_current_assets", "FQ") : na
