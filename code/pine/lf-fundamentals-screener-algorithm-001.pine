@@ -125,9 +125,6 @@ float opcf_current_y_val  = not na(f_opcf_current_y) ? f_opcf_current_y : opcf_c
 float opcf_prev_y_val     = not na(opcf_prev_y_fetched) ? opcf_prev_y_fetched : opcf_prev_y
 
 
-// --- Helper guards ---
-is_non_na(x) => not na(x)
-
 // Criterion checks (booleans). Any `na` inputs cause the specific check
 // to evaluate to `false` (conservative default). Users can replace inputs
 // with platform-fetched fields when available.
@@ -136,60 +133,60 @@ is_non_na(x) => not na(x)
 c1 = str.upper(market_segment) == "YILDIZ" or str.upper(market_segment) == "YLDIZ"
 
 // 2 — Quarterly Increasing ROE
-c2 = is_non_na(roe_q_val) and is_non_na(roe_q_prev_val) and (roe_q_val > roe_q_prev_val)
+c2 = not na(roe_q_val) and not na(roe_q_prev_val) and (roe_q_val > roe_q_prev_val)
 
 // 3 — Quarterly Increasing Net Profit
-c3 = is_non_na(netprofit_q_val) and is_non_na(netprofit_q_prev_val) and (netprofit_q_val > netprofit_q_prev_val)
+c3 = not na(netprofit_q_val) and not na(netprofit_q_prev_val) and (netprofit_q_val > netprofit_q_prev_val)
 
 // 4 — Quarterly Increasing Revenue
-c4 = is_non_na(revenue_q_val) and is_non_na(revenue_q_prev_val) and (revenue_q_val > revenue_q_prev_val)
+c4 = not na(revenue_q_val) and not na(revenue_q_prev_val) and (revenue_q_val > revenue_q_prev_val)
 
 // 5 — Quarterly Increasing EBITDA
-c5 = is_non_na(ebitda_q_val) and is_non_na(ebitda_q_prev_val) and (ebitda_q_val > ebitda_q_prev_val)
+c5 = not na(ebitda_q_val) and not na(ebitda_q_prev_val) and (ebitda_q_val > ebitda_q_prev_val)
 
 // 6 — Quarterly Increasing EBITDA Margin
-ebitda_margin_q      = is_non_na(ebitda_q_val) and is_non_na(revenue_q_val) and (revenue_q_val != 0) ? ebitda_q_val / revenue_q_val : na
-ebitda_margin_q_prev = is_non_na(ebitda_q_prev_val) and is_non_na(revenue_q_prev_val) and (revenue_q_prev_val != 0) ? ebitda_q_prev_val / revenue_q_prev_val : na
-c6 = is_non_na(ebitda_margin_q) and is_non_na(ebitda_margin_q_prev) and (ebitda_margin_q > ebitda_margin_q_prev)
+ebitda_margin_q      = not na(ebitda_q_val) and not na(revenue_q_val) and (revenue_q_val != 0) ? ebitda_q_val / revenue_q_val : na
+ebitda_margin_q_prev = not na(ebitda_q_prev_val) and not na(revenue_q_prev_val) and (revenue_q_prev_val != 0) ? ebitda_q_prev_val / revenue_q_prev_val : na
+c6 = not na(ebitda_margin_q) and not na(ebitda_margin_q_prev) and (ebitda_margin_q > ebitda_margin_q_prev)
 
 // 7 — Quarterly Increasing Operating Profit
-c7 = is_non_na(operprofit_q_val) and is_non_na(operprofit_q_prev_val) and (operprofit_q_val > operprofit_q_prev_val)
+c7 = not na(operprofit_q_val) and not na(operprofit_q_prev_val) and (operprofit_q_val > operprofit_q_prev_val)
 
 // 8 — Quarterly Increasing EPS
-c8 = is_non_na(eps_q_val) and is_non_na(eps_q_prev_val) and (eps_q_val > eps_q_prev_val)
+c8 = not na(eps_q_val) and not na(eps_q_prev_val) and (eps_q_val > eps_q_prev_val)
 
 // 9 — Free Float Rate Below 70%
-c9 = is_non_na(free_float_val) and (free_float_val < 0.70)
+c9 = not na(free_float_val) and (free_float_val < 0.70)
 
 // 10 — PEG Ratio Below 1 (only when earnings growth > 0)
-c10 = is_non_na(peg_ratio_val) and is_non_na(earnings_growth_val) and (earnings_growth_val > 0) and (peg_ratio_val < 1.0)
+c10 = not na(peg_ratio_val) and not na(earnings_growth_val) and (earnings_growth_val > 0) and (peg_ratio_val < 1.0)
 
 // 11 — Current Ratio Between 1 and 3
-curr_ratio = is_non_na(current_assets_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? current_assets_val / current_liab_val : na
-c11 = is_non_na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
+curr_ratio = not na(current_assets_val) and not na(current_liab_val) and (current_liab_val != 0) ? current_assets_val / current_liab_val : na
+c11 = not na(curr_ratio) and (curr_ratio >= 1.0) and (curr_ratio <= 3.0)
 
 // 12 — Net Debt / EBITDA Below 3
-net_debt = is_non_na(total_debt_val) and is_non_na(cash_equiv_val) ? (total_debt_val - cash_equiv_val) : na
+net_debt = not na(total_debt_val) and not na(cash_equiv_val) ? (total_debt_val - cash_equiv_val) : na
 // Prefer fetched annual EBITDA; fall back to quarterly * 4 as a rough estimate only
-ebitda_annual = not na(f_ebitda_fy) ? f_ebitda_fy : (is_non_na(ebitda_q_val) ? ebitda_q_val * 4.0 : na)
+ebitda_annual = not na(f_ebitda_fy) ? f_ebitda_fy : (not na(ebitda_q_val) ? ebitda_q_val * 4.0 : na)
 c12 = false
-if is_non_na(net_debt)
-    if is_non_na(ebitda_annual) and (ebitda_annual > 0)
+if not na(net_debt)
+    if not na(ebitda_annual) and (ebitda_annual > 0)
         c12 := (net_debt / ebitda_annual) < 3.0
     else
         // Negative net debt (more cash than debt) passes automatically
         c12 := net_debt < 0
 
 // 13 — Cash Ratio Above 0.2
-cash_ratio = is_non_na(cash_equiv_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? cash_equiv_val / current_liab_val : na
-c13 = is_non_na(cash_ratio) and (cash_ratio > 0.20)
+cash_ratio = not na(cash_equiv_val) and not na(current_liab_val) and (current_liab_val != 0) ? cash_equiv_val / current_liab_val : na
+c13 = not na(cash_ratio) and (cash_ratio > 0.20)
 
 // 14 — Quick Ratio Between 0.5 and 2
-quick_ratio = is_non_na(current_assets_val) and is_non_na(inventory_val) and is_non_na(current_liab_val) and (current_liab_val != 0) ? (current_assets_val - inventory_val) / current_liab_val : na
-c14 = is_non_na(quick_ratio) and (quick_ratio >= 0.5) and (quick_ratio <= 2.0)
+quick_ratio = not na(current_assets_val) and not na(inventory_val) and not na(current_liab_val) and (current_liab_val != 0) ? (current_assets_val - inventory_val) / current_liab_val : na
+c14 = not na(quick_ratio) and (quick_ratio >= 0.5) and (quick_ratio <= 2.0)
 
 // 15 — Positive Year-over-Year Operating Cash Flow Growth
-c15 = is_non_na(opcf_current_y_val) and is_non_na(opcf_prev_y_val) and (opcf_current_y_val > opcf_prev_y_val)
+c15 = not na(opcf_current_y_val) and not na(opcf_prev_y_val) and (opcf_current_y_val > opcf_prev_y_val)
 
 // Overall result: require all criteria to be true
 all_pass = c1 and c2 and c3 and c4 and c5 and c6 and c7 and c8 and c9 and c10 and c11 and c12 and c13 and c14 and c15
